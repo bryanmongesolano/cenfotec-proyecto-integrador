@@ -21,8 +21,8 @@ const ProductoSchema = new mongoose.Schema({
         min: 0
     },
     categoria: {
-        type: String,
-        trim: true
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Categoria'
     },
     marca: {
         type: String,

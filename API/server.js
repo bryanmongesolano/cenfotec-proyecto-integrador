@@ -20,6 +20,9 @@ app.get('/', (req, res) => {
 
 app.use('/usuarios', require('./routes/UsuarioRoutes'));
 app.use('/productos', require('./routes/ProductoRoutes'));
+app.use('/categorias', require('./routes/CategoriaRoutes'));
+app.use('/carrito', require('./routes/CarritoRoutes'));
+app.use('/pedidos', require('./routes/PedidoRoutes'));
 
 
 
