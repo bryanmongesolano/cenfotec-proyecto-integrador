@@ -34,7 +34,8 @@ router.get('/:usuarioId', async (req, res) => {
 
         res.json(carrito);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
+        res.status(codigo).json({ message: error.message });
     }
 });
 
@@ -103,7 +104,8 @@ router.post('/:usuarioId/items', async (req, res) => {
             datos: carritoGuardado
         })
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
+        res.status(codigo).json({ message: error.message });
     }
 });
 
@@ -157,7 +159,8 @@ router.put('/:usuarioId/items/:itemId', async (req, res) => {
             datos: carritoGuardado
         });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
+        res.status(codigo).json({ message: error.message });
     }
 });
 
@@ -189,7 +192,8 @@ router.delete('/:usuarioId/items/:itemId', async (req, res) => {
             datos: carritoGuardado
         });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
+        res.status(codigo).json({ message: error.message });
     }
 });
 
@@ -213,7 +217,8 @@ router.delete('/:usuarioId', async (req, res) => {
             datos: req.params.usuarioId
         });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
+        res.status(codigo).json({ message: error.message });
     }
 });
 

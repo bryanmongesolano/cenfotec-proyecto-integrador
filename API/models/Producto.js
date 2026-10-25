@@ -20,6 +20,11 @@ const ProductoSchema = new mongoose.Schema({
         default: 0,
         min: 0
     },
+    stockMinimo: {
+        type: Number,
+        default: 0,
+        min: 0
+    },
     categoria: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Categoria'
@@ -38,6 +43,14 @@ const ProductoSchema = new mongoose.Schema({
     imagenes: {
         type: [String],
         default: []
+    },
+    viral: {
+        type: Boolean,
+        default: false
+    },
+    destacado: {
+        type: Boolean,
+        default: false
     },
     estado: {
         type: Boolean,

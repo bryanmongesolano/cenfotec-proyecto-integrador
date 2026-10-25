@@ -22,7 +22,8 @@ router.get('/', async (req, res) => {
 
         res.json(categorias);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
+        res.status(codigo).json({ message: error.message });
     }
 });
 
@@ -46,7 +47,8 @@ router.get('/:id/productos', async (req, res) => {
             productos
         });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
+        res.status(codigo).json({ message: error.message });
     }
 });
 
@@ -63,7 +65,8 @@ router.get('/:id', async (req, res) => {
 
         res.json(categoria);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
+        res.status(codigo).json({ message: error.message });
     }
 });
 
@@ -71,6 +74,14 @@ router.get('/:id', async (req, res) => {
 //POST
 router.post('/', async (req, res) => {
     try {
+        if (req.body.padre) {
+            const padre = await Categoria.findById(req.body.padre);
+
+            if (!padre) {
+                return res.status(404).json({ message: "Categoría padre no encontrada" + req.body.padre });
+            }
+        }
+
         const categoria = new Categoria(req.body);
 
         const categoriaGuardada = await categoria.save();
@@ -80,7 +91,8 @@ router.post('/', async (req, res) => {
             datos: categoriaGuardada
         })
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
+        res.status(codigo).json({ message: error.message });
     }
 });
 
@@ -88,6 +100,14 @@ router.post('/', async (req, res) => {
 //PUT por ID
 router.put('/:id', async (req, res) => {
     try {
+        if (req.body.padre) {
+            const padre = await Categoria.findById(req.body.padre);
+
+            if (!padre) {
+                return res.status(404).json({ message: "Categoría padre no encontrada" + req.body.padre });
+            }
+        }
+
         if (req.body.padre && req.body.padre === req.params.id) {
             return res.status(400).json({ message: "Una categoría no puede ser su propia categoría padre" });
         }
@@ -111,7 +131,8 @@ router.put('/:id', async (req, res) => {
             }
         );
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
+        res.status(codigo).json({ message: error.message });
     }
 });
 
@@ -143,7 +164,8 @@ router.delete('/:id', async (req, res) => {
             }
         );
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
+        res.status(codigo).json({ message: error.message });
     }
 });
 

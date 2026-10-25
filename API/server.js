@@ -23,6 +23,8 @@ app.use('/productos', require('./routes/ProductoRoutes'));
 app.use('/categorias', require('./routes/CategoriaRoutes'));
 app.use('/carrito', require('./routes/CarritoRoutes'));
 app.use('/pedidos', require('./routes/PedidoRoutes'));
+app.use('/resennas', require('./routes/ResennaRoutes'));
+app.use('/pagos', require('./routes/PagoRoutes'));
 
 
 

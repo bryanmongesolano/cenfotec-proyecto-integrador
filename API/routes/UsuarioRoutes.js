@@ -8,7 +8,8 @@ router.get('/', async (req, res) => {
         const usuarios = await Usuario.find();
         res.json(usuarios);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
+        res.status(codigo).json({ message: error.message });
     }
 });
 
@@ -24,10 +25,8 @@ router.get('/:id', async (req, res) => {
         res.json(usuarios);
 
     } catch (error) {
-        res.status(500).json({
-            message: error.message,
-            otro: "errores"
-        });
+        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
+        res.status(codigo).json({ message: error.message });
     }
 });
 
@@ -43,7 +42,8 @@ router.post('/', async (req, res) => {
             datos: usuarioGuardado
         })
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
+        res.status(codigo).json({ message: error.message });
     }
 });
 
@@ -70,10 +70,8 @@ router.put('/:id', async (req, res) => {
         );
 
     } catch (error) {
-        res.status(500).json({
-            message: error.message,
-            otro: "errores"
-        });
+        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
+        res.status(codigo).json({ message: error.message });
     }
 });
 
@@ -96,10 +94,8 @@ router.delete('/:id', async (req, res) => {
         );
 
     } catch (error) {
-        res.status(500).json({
-            message: error.message,
-            otro: "errores"
-        });
+        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
+        res.status(codigo).json({ message: error.message });
     }
 });
 

@@ -6,6 +6,7 @@ const Producto = require('../models/Producto');
 const Usuario = require('../models/Usuario');
 
 const ESTADOS = ['pendiente', 'pagado', 'enviado', 'entregado', 'cancelado'];
+const IVA = 0.13;
 
 async function devolverStock(items) {
     for (const item of items) {
@@ -39,7 +40,8 @@ router.get('/', async (req, res) => {
 
         res.json(pedidos);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
+        res.status(codigo).json({ message: error.message });
     }
 });
 
@@ -52,7 +54,55 @@ router.get('/usuario/:usuarioId', async (req, res) => {
 
         res.json(pedidos);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
+        res.status(codigo).json({ message: error.message });
+    }
+});
+
+
+//GET estadísticas para el dashboard
+router.get('/estadisticas', async (req, res) => {
+    try {
+        const totalPedidos = await Pedido.countDocuments();
+
+        const pedidosPorEstado = await Pedido.aggregate([
+            { $group: { _id: '$estado', cantidad: { $sum: 1 } } }
+        ]);
+
+        const ventas = await Pedido.aggregate([
+            { $match: { estado: { $ne: 'cancelado' } } },
+            { $group: { _id: null, total: { $sum: '$total' } } }
+        ]);
+
+        const productosMasVendidos = await Pedido.aggregate([
+            { $match: { estado: { $ne: 'cancelado' } } },
+            { $unwind: '$items' },
+            {
+                $group: {
+                    _id: '$items.producto',
+                    nombre: { $first: '$items.nombre' },
+                    cantidad: { $sum: '$items.cantidad' },
+                    total: { $sum: '$items.subtotal' }
+                }
+            },
+            { $sort: { cantidad: -1 } },
+            { $limit: 5 }
+        ]);
+
+        const productosStockBajo = await Producto.countDocuments({
+            $expr: { $lte: ['$stock', '$stockMinimo'] }
+        });
+
+        res.json({
+            totalPedidos,
+            totalVentas: ventas.length > 0 ? ventas[0].total : 0,
+            pedidosPorEstado,
+            productosMasVendidos,
+            productosStockBajo
+        });
+    } catch (error) {
+        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
+        res.status(codigo).json({ message: error.message });
     }
 });
 
@@ -69,7 +119,8 @@ router.get('/:id', async (req, res) => {
 
         res.json(pedido);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
+        res.status(codigo).json({ message: error.message });
     }
 });
 
@@ -146,13 +197,15 @@ router.post('/', async (req, res) => {
         }
 
         const subtotal = items.reduce((acumulado, item) => acumulado + item.subtotal, 0);
-        const total = Math.max(0, subtotal + Number(costoEnvio) - Number(descuento));
+        const impuestos = Math.round(subtotal * IVA * 100) / 100;
+        const total = Math.max(0, subtotal + impuestos + Number(costoEnvio) - Number(descuento));
 
         const pedido = new Pedido({
             usuario,
             items,
             direccionEnvio,
             subtotal,
+            impuestos,
             costoEnvio,
             descuento,
             total,
@@ -171,7 +224,8 @@ router.post('/', async (req, res) => {
         })
     } catch (error) {
         await devolverStock(descontados);
-        res.status(500).json({ message: error.message });
+        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
+        res.status(codigo).json({ message: error.message });
     }
 });
 
@@ -179,7 +233,7 @@ router.post('/', async (req, res) => {
 //PATCH
 router.patch('/:id/estado', async (req, res) => {
     try {
-        const { estado } = req.body;
+        const { estado, motivo } = req.body;
 
         if (!ESTADOS.includes(estado)) {
             return res.status(400).json({ message: `Estado inválido. Valores permitidos: ${ESTADOS.join(', ')}` });
@@ -194,6 +248,11 @@ router.patch('/:id/estado', async (req, res) => {
         const estadoAnterior = pedido.estado;
 
         pedido.estado = estado;
+
+        if (estado === 'cancelado' && motivo) {
+            pedido.motivoCancelacion = motivo;
+        }
+
         const pedidoGuardado = await pedido.save();
 
         // Al cancelar se devuelve el stock reservado por el pedido
@@ -206,7 +265,8 @@ router.patch('/:id/estado', async (req, res) => {
             datos: pedidoGuardado
         });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
+        res.status(codigo).json({ message: error.message });
     }
 });
 
@@ -231,7 +291,8 @@ router.delete('/:id', async (req, res) => {
             }
         );
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
+        res.status(codigo).json({ message: error.message });
     }
 });
 

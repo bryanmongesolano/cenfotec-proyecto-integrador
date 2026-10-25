@@ -63,6 +63,10 @@ const PedidoSchema = new mongoose.Schema({
         type: String,
         unique: true
     },
+    fecha: {
+        type: Date,
+        default: Date.now
+    },
     usuario: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Usuario',
@@ -84,6 +88,11 @@ const PedidoSchema = new mongoose.Schema({
         required: true,
         min: 0
     },
+    impuestos: {
+        type: Number,
+        default: 0,
+        min: 0
+    },
     costoEnvio: {
         type: Number,
         default: 0,
@@ -103,6 +112,10 @@ const PedidoSchema = new mongoose.Schema({
         type: String,
         enum: ['pendiente', 'pagado', 'enviado', 'entregado', 'cancelado'],
         default: 'pendiente'
+    },
+    motivoCancelacion: {
+        type: String,
+        trim: true
     },
     metodoPago: {
         type: String,

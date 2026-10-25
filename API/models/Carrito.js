@@ -30,6 +30,16 @@ const CarritoSchema = new mongoose.Schema({
         type: [CarritoItemSchema],
         default: []
     },
+    subtotal: {
+        type: Number,
+        default: 0,
+        min: 0
+    },
+    impuestos: {
+        type: Number,
+        default: 0,
+        min: 0
+    },
     total: {
         type: Number,
         default: 0,
@@ -41,10 +51,15 @@ const CarritoSchema = new mongoose.Schema({
     }
 });
 
+const IVA = 0.13;
+
 CarritoSchema.methods.recalcularTotal = function () {
-    this.total = this.items.reduce((acumulado, item) => {
+    this.subtotal = this.items.reduce((acumulado, item) => {
         return acumulado + (item.precioUnitario * item.cantidad);
     }, 0);
+
+    this.impuestos = Math.round(this.subtotal * IVA * 100) / 100;
+    this.total = this.subtotal + this.impuestos;
 
     return this.total;
 };
