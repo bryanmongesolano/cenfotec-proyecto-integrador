@@ -52,17 +52,20 @@ const UsuarioSchema = new mongoose.Schema({
         unique: true,
         sparse: true,
         trim: true,
+        match: [/^\d{9}$/, 'La cédula debe tener 9 dígitos']
     },
     telefono: {
         type: String,
         trim: true,
+        match: [/^[0-9+\-\s]{8,}$/, 'El teléfono no es válido']
     },
     correo: {
         type: String,
         required: true,
         unique: true,
         lowercase: true,
-        trim: true
+        trim: true,
+        match: [/^\S+@\S+\.\S+$/, 'El correo no es válido']
     },
     contrasenna: {
         type: String,
