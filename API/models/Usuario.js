@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const DireccionSchema = new mongoose.Schema({
     provincia: {
@@ -70,7 +71,16 @@ const UsuarioSchema = new mongoose.Schema({
     contrasenna: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        select: false
+    },
+    tokenRecuperacion: {
+        type: String,
+        select: false
+    },
+    tokenExpira: {
+        type: Date,
+        select: false
     },
     estado: {
         type: Boolean,
@@ -85,6 +95,15 @@ const UsuarioSchema = new mongoose.Schema({
         type: [DireccionSchema],
         default: []
     }
+});
+
+UsuarioSchema.pre('save', async function (next) {
+    if (!this.isModified('contrasenna')) {
+        return next();
+    }
+
+    this.contrasenna = await bcrypt.hash(this.contrasenna, 10);
+    next();
 });
 
 module.exports = mongoose.model('Usuario', UsuarioSchema);

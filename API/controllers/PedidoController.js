@@ -107,6 +107,12 @@ const obtener = async (req, res) => {
             return res.status(404).json({ message: "Pedido no encontrado" + req.params.id });
         }
 
+        const duenio = pedido.usuario && pedido.usuario._id ? pedido.usuario._id : pedido.usuario;
+
+        if (req.usuario.rol !== 'admin' && String(duenio) !== String(req.usuario._id)) {
+            return res.status(403).json({ message: "No tiene permiso para ver este pedido" });
+        }
+
         res.json(pedido);
     } catch (error) {
         const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
@@ -118,11 +124,11 @@ const crear = async (req, res) => {
     const descontados = [];
 
     try {
-        const { usuario, direccionEnvio, costoEnvio = 0, descuento = 0, metodoPago = 'efectivo' } = req.body;
+        const { direccionEnvio, costoEnvio = 0, descuento = 0, metodoPago = 'efectivo' } = req.body;
 
-        if (!usuario) {
-            return res.status(400).json({ message: "El usuario es obligatorio" });
-        }
+        const usuario = req.usuario.rol === 'admin' && req.body.usuario
+            ? req.body.usuario
+            : req.usuario._id;
 
         if (!direccionEnvio || typeof direccionEnvio !== 'object') {
             return res.status(400).json({ message: "La dirección de envío es obligatoria" });

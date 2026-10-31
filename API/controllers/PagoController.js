@@ -48,6 +48,10 @@ const crear = async (req, res) => {
             return res.status(404).json({ message: "Pedido no encontrado" + req.body.pedido });
         }
 
+        if (req.usuario.rol !== 'admin' && String(pedido.usuario) !== String(req.usuario._id)) {
+            return res.status(403).json({ message: "No tiene permiso para registrar un pago de este pedido" });
+        }
+
         const pago = new Pago(req.body);
 
         const pagoGuardado = await pago.save();

@@ -30,10 +30,12 @@ const crear = async (req, res) => {
         const usuario = new Usuario(req.body);
 
         const usuarioGuardado = await usuario.save();
+        const datos = usuarioGuardado.toObject();
+        delete datos.contrasenna;
 
         res.status(201).json({
             mensaje: "Usuario creado",
-            datos: usuarioGuardado
+            datos
         })
     } catch (error) {
         const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
@@ -43,22 +45,22 @@ const crear = async (req, res) => {
 
 const actualizar = async (req, res) => {
     try {
-        const usuario = await Usuario.findByIdAndUpdate(
-            req.params.id,
-            req.body, {
-            new: true,
-            runValidators: true
-        }
-        );
+        const usuario = await Usuario.findById(req.params.id);
 
         if (!usuario) {
             return res.status(404).json({ message: "Usuario no encontrado" + req.params.id });
         }
 
+        Object.assign(usuario, req.body);
+        await usuario.save();
+
+        const datos = usuario.toObject();
+        delete datos.contrasenna;
+
         res.json(
             {
                 mensaje: "Usuario actualizado",
-                datos: usuario
+                datos
             }
         );
     } catch (error) {

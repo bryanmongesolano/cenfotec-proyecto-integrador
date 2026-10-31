@@ -18,6 +18,7 @@ app.get('/', (req, res) => {
 });
 
 
+app.use('/auth', require('./routes/AuthRoutes'));
 app.use('/usuarios', require('./routes/UsuarioRoutes'));
 app.use('/productos', require('./routes/ProductoRoutes'));
 app.use('/categorias', require('./routes/CategoriaRoutes'));

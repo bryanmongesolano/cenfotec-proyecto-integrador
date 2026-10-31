@@ -51,13 +51,12 @@ const crear = async (req, res) => {
             return res.status(404).json({ message: "Producto no encontrado" + req.body.producto });
         }
 
-        const usuario = await Usuario.findById(req.body.usuario);
-
-        if (!usuario) {
-            return res.status(404).json({ message: "Usuario no encontrado" + req.body.usuario });
-        }
-
-        const resenna = new Resenna(req.body);
+        const resenna = new Resenna({
+            producto: req.body.producto,
+            usuario: req.usuario._id,
+            calificacion: req.body.calificacion,
+            comentario: req.body.comentario
+        });
 
         const resennaGuardada = await resenna.save();
 
@@ -73,6 +72,20 @@ const crear = async (req, res) => {
 
 const actualizar = async (req, res) => {
     try {
+        const existente = await Resenna.findById(req.params.id);
+
+        if (!existente) {
+            return res.status(404).json({ message: "Reseña no encontrada" + req.params.id });
+        }
+
+        if (req.usuario.rol !== 'admin' && String(existente.usuario) !== String(req.usuario._id)) {
+            return res.status(403).json({ message: "No tiene permiso para modificar esta reseña" });
+        }
+
+        if (req.usuario.rol !== 'admin') {
+            delete req.body.usuario;
+        }
+
         if (req.body.producto) {
             const producto = await Producto.findById(req.body.producto);
 
