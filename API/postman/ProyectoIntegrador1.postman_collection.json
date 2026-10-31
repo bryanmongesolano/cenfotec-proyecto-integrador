@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Proyecto Integrador 1 - API E-commerce",
-    "description": "Coleccion de pruebas de la API REST. Ejecutar con el Collection Runner en el orden de las carpetas (Usuarios, Categorias, Productos, Carrito, Pedidos, Resennas, Pagos y Limpieza). Las carpetas crean los ids y los guardan en variables de coleccion.",
+    "description": "Coleccion de pruebas de la API REST con autenticacion JWT. Antes de ejecutar: npm run seed:admin. Luego ejecutar con el Collection Runner en el orden de las carpetas. La carpeta 0. Auth obtiene adminToken y token; el resto los usa automaticamente.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -10,7 +10,23 @@
       "value": "http://localhost:5001"
     },
     {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "resetToken",
+      "value": ""
+    },
+    {
       "key": "usuarioId",
+      "value": ""
+    },
+    {
+      "key": "usuarioAdminId",
       "value": ""
     },
     {
@@ -44,7 +60,340 @@
   ],
   "item": [
     {
-      "name": "1. Usuarios",
+      "name": "0. Auth",
+      "item": [
+        {
+          "name": "Login admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "if (body.datos.token) {",
+                  "    pm.collectionVariables.set(\"adminToken\", body.datos.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"admin@tienda.com\",\n  \"contrasenna\": \"Admin123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Registro cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "if (body.datos && body.datos.token) {",
+                  "    pm.collectionVariables.set(\"token\", body.datos.token);",
+                  "}",
+                  "if (body.datos && body.datos.usuario) {",
+                  "    pm.collectionVariables.set(\"usuarioId\", body.datos.usuario._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Cliente\",\n  \"apellido\": \"Prueba\",\n  \"telefono\": \"8888-1111\",\n  \"correo\": \"cliente@example.com\",\n  \"contrasenna\": \"Clave123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/auth/registro"
+          }
+        },
+        {
+          "name": "Perfil (token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/perfil"
+          }
+        },
+        {
+          "name": "Actualizar perfil",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telefono\": \"8888-2222\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/auth/perfil"
+          }
+        },
+        {
+          "name": "Cambiar contrasena",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contrasennaActual\": \"Clave123!\",\n  \"contrasennaNueva\": \"Clave123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/auth/contrasenna"
+          }
+        },
+        {
+          "name": "Recuperar contrasena",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "if (body.datos.token) {",
+                  "    pm.collectionVariables.set(\"resetToken\", body.datos.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"cliente@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/auth/recuperar"
+          }
+        },
+        {
+          "name": "Restablecer contrasena",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"cliente@example.com\",\n  \"token\": \"{{resetToken}}\",\n  \"contrasenna\": \"Clave123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/auth/restablecer"
+          }
+        },
+        {
+          "name": "Login cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "if (body.datos.token) {",
+                  "    pm.collectionVariables.set(\"token\", body.datos.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"cliente@example.com\",\n  \"contrasenna\": \"Clave123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Perfil sin token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/perfil"
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Usuarios (admin)",
       "item": [
         {
           "name": "Listar usuarios",
@@ -67,6 +416,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "url": "{{baseUrl}}/usuarios"
@@ -93,6 +446,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "url": "{{baseUrl}}/usuarios/{{usuarioId}}"
@@ -110,8 +467,8 @@
                   "    pm.response.to.have.status(201);",
                   "});",
                   "const body = pm.response.json();",
-                  "if (body.datos && body.datos._id) {",
-                  "    pm.collectionVariables.set(\"usuarioId\", body.datos._id);",
+                  "if (body.datos._id) {",
+                  "    pm.collectionVariables.set(\"usuarioAdminId\", body.datos._id);",
                   "}"
                 ]
               }
@@ -123,46 +480,15 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"nombre\": \"Bryan\",\n  \"apellido\": \"Monge\",\n  \"apellido2\": \"Solano\",\n  \"cedula\": \"112340567\",\n  \"telefono\": \"8888-7777\",\n  \"correo\": \"bryan@example.com\",\n  \"contrasenna\": \"Clave123!\",\n  \"rol\": \"cliente\",\n  \"estado\": true,\n  \"direcciones\": [\n    {\n      \"provincia\": \"San José\",\n      \"canton\": \"Central\",\n      \"distrito\": \"Carmen\",\n      \"codigoPostal\": \"10101\",\n      \"direccionExacta\": \"Calle 5, casa 12\",\n      \"tipo\": \"casa\",\n      \"esPrincipal\": true\n    }\n  ]\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": "{{baseUrl}}/usuarios"
-          }
-        },
-        {
-          "name": "Crear usuario - correo invalido (400)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"HTTP 400\", function () {",
-                  "    pm.response.to.have.status(400);",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Sin\",\n  \"apellido\": \"Correo\",\n  \"correo\": \"correo-invalido\",\n  \"contrasenna\": \"x\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -193,6 +519,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "body": {
@@ -228,6 +558,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "body": {
@@ -239,7 +573,67 @@
                 }
               }
             },
-            "url": "{{baseUrl}}/usuarios/{{usuarioId}}"
+            "url": "{{baseUrl}}/usuarios/{{usuarioAdminId}}"
+          }
+        },
+        {
+          "name": "Eliminar usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/usuarios/{{usuarioAdminId}}"
+          }
+        },
+        {
+          "name": "Cliente lista usuarios (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/usuarios"
           }
         }
       ]
@@ -285,7 +679,7 @@
                   "    pm.response.to.have.status(201);",
                   "});",
                   "const body = pm.response.json();",
-                  "if (body.datos && body.datos._id) {",
+                  "if (body.datos._id) {",
                   "    pm.collectionVariables.set(\"categoriaId\", body.datos._id);",
                   "}"
                 ]
@@ -298,6 +692,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "body": {
@@ -324,7 +722,7 @@
                   "    pm.response.to.have.status(201);",
                   "});",
                   "const body = pm.response.json();",
-                  "if (body.datos && body.datos._id) {",
+                  "if (body.datos._id) {",
                   "    pm.collectionVariables.set(\"subcategoriaId\", body.datos._id);",
                   "}"
                 ]
@@ -337,6 +735,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "body": {
@@ -424,6 +826,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "body": {
@@ -459,11 +865,50 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"nombre\": \"Hija\",\n  \"padre\": \"000000000000000000000000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/categorias"
+          }
+        },
+        {
+          "name": "Crear categoria sin token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Sin token\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -672,7 +1117,7 @@
                   "    pm.response.to.have.status(201);",
                   "});",
                   "const body = pm.response.json();",
-                  "if (body.datos && body.datos._id) {",
+                  "if (body.datos._id) {",
                   "    pm.collectionVariables.set(\"productoId\", body.datos._id);",
                   "}"
                 ]
@@ -685,6 +1130,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "body": {
@@ -720,6 +1169,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "body": {
@@ -781,6 +1234,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "body": {
@@ -816,6 +1273,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "body": {
@@ -833,7 +1294,7 @@
       ]
     },
     {
-      "name": "4. Carrito",
+      "name": "4. Carrito (cliente)",
       "item": [
         {
           "name": "Ver carrito del usuario",
@@ -856,6 +1317,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": "{{baseUrl}}/carrito/{{usuarioId}}"
@@ -873,7 +1338,7 @@
                   "    pm.response.to.have.status(201);",
                   "});",
                   "const body = pm.response.json();",
-                  "if (body.datos && body.datos.items && body.datos.items.length > 0) {",
+                  "if (body.datos.items[0]._id) {",
                   "    pm.collectionVariables.set(\"itemId\", body.datos.items[0]._id);",
                   "}"
                 ]
@@ -886,6 +1351,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "body": {
@@ -921,6 +1390,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "body": {
@@ -956,6 +1429,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": "{{baseUrl}}/carrito/{{usuarioId}}/items/{{itemId}}"
@@ -973,7 +1450,7 @@
                   "    pm.response.to.have.status(201);",
                   "});",
                   "const body = pm.response.json();",
-                  "if (body.datos && body.datos.items && body.datos.items.length > 0) {",
+                  "if (body.datos.items[0]._id) {",
                   "    pm.collectionVariables.set(\"itemId\", body.datos.items[0]._id);",
                   "}"
                 ]
@@ -986,6 +1463,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "body": {
@@ -1021,6 +1502,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": "{{baseUrl}}/carrito/{{usuarioId}}"
@@ -1043,7 +1528,7 @@
                   "    pm.response.to.have.status(201);",
                   "});",
                   "const body = pm.response.json();",
-                  "if (body.datos && body.datos.items && body.datos.items.length > 0) {",
+                  "if (body.datos.items[0]._id) {",
                   "    pm.collectionVariables.set(\"itemId\", body.datos.items[0]._id);",
                   "}"
                 ]
@@ -1056,6 +1541,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "body": {
@@ -1082,7 +1571,7 @@
                   "    pm.response.to.have.status(201);",
                   "});",
                   "const body = pm.response.json();",
-                  "if (body.datos && body.datos._id) {",
+                  "if (body.datos._id) {",
                   "    pm.collectionVariables.set(\"pedidoId\", body.datos._id);",
                   "}"
                 ]
@@ -1095,6 +1584,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "body": {
@@ -1110,7 +1603,7 @@
           }
         },
         {
-          "name": "Listar todos los pedidos",
+          "name": "Listar todos los pedidos (admin)",
           "event": [
             {
               "listen": "test",
@@ -1130,6 +1623,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "url": "{{baseUrl}}/pedidos"
@@ -1156,6 +1653,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": "{{baseUrl}}/pedidos/usuario/{{usuarioId}}"
@@ -1182,13 +1683,17 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": "{{baseUrl}}/pedidos/{{pedidoId}}"
           }
         },
         {
-          "name": "Estadisticas del dashboard",
+          "name": "Estadisticas del dashboard (admin)",
           "event": [
             {
               "listen": "test",
@@ -1208,13 +1713,17 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "url": "{{baseUrl}}/pedidos/estadisticas"
           }
         },
         {
-          "name": "Cambiar estado del pedido",
+          "name": "Cambiar estado del pedido (admin)",
           "event": [
             {
               "listen": "test",
@@ -1234,6 +1743,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "body": {
@@ -1249,7 +1762,7 @@
           }
         },
         {
-          "name": "Cancelar pedido con motivo",
+          "name": "Cancelar pedido con motivo (admin)",
           "event": [
             {
               "listen": "test",
@@ -1269,6 +1782,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "body": {
@@ -1304,6 +1821,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "body": {
@@ -1387,7 +1908,7 @@
                   "    pm.response.to.have.status(201);",
                   "});",
                   "const body = pm.response.json();",
-                  "if (body.datos && body.datos._id) {",
+                  "if (body.datos._id) {",
                   "    pm.collectionVariables.set(\"resennaId\", body.datos._id);",
                   "}"
                 ]
@@ -1400,6 +1921,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "body": {
@@ -1435,6 +1960,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "body": {
@@ -1496,6 +2025,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "body": {
@@ -1511,7 +2044,7 @@
           }
         },
         {
-          "name": "Eliminar resenna",
+          "name": "Eliminar resenna (admin)",
           "event": [
             {
               "listen": "test",
@@ -1531,6 +2064,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "url": "{{baseUrl}}/resennas/{{resennaId}}"
@@ -1542,7 +2079,7 @@
       "name": "7. Pagos",
       "item": [
         {
-          "name": "Listar pagos",
+          "name": "Listar pagos (admin)",
           "event": [
             {
               "listen": "test",
@@ -1562,13 +2099,17 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "url": "{{baseUrl}}/pagos"
           }
         },
         {
-          "name": "Pagos de un pedido",
+          "name": "Pagos de un pedido (admin)",
           "event": [
             {
               "listen": "test",
@@ -1588,6 +2129,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "url": "{{baseUrl}}/pagos?pedido={{pedidoId}}"
@@ -1605,7 +2150,7 @@
                   "    pm.response.to.have.status(201);",
                   "});",
                   "const body = pm.response.json();",
-                  "if (body.datos && body.datos._id) {",
+                  "if (body.datos._id) {",
                   "    pm.collectionVariables.set(\"pagoId\", body.datos._id);",
                   "}"
                 ]
@@ -1618,6 +2163,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "body": {
@@ -1653,6 +2202,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "body": {
@@ -1668,7 +2221,7 @@
           }
         },
         {
-          "name": "Obtener pago por ID",
+          "name": "Obtener pago por ID (admin)",
           "event": [
             {
               "listen": "test",
@@ -1688,13 +2241,17 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "url": "{{baseUrl}}/pagos/{{pagoId}}"
           }
         },
         {
-          "name": "Aprobar pago",
+          "name": "Aprobar pago (admin)",
           "event": [
             {
               "listen": "test",
@@ -1714,6 +2271,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "body": {
@@ -1729,7 +2290,7 @@
           }
         },
         {
-          "name": "Eliminar pago",
+          "name": "Eliminar pago (admin)",
           "event": [
             {
               "listen": "test",
@@ -1749,6 +2310,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "url": "{{baseUrl}}/pagos/{{pagoId}}"
@@ -1780,6 +2345,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "url": "{{baseUrl}}/pedidos/{{pedidoId}}"
@@ -1806,6 +2375,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "url": "{{baseUrl}}/productos/{{productoId}}"
@@ -1832,6 +2405,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "url": "{{baseUrl}}/categorias/{{subcategoriaId}}"
@@ -1858,13 +2435,17 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "url": "{{baseUrl}}/categorias/{{categoriaId}}"
           }
         },
         {
-          "name": "Eliminar usuario",
+          "name": "Eliminar usuario cliente",
           "event": [
             {
               "listen": "test",
@@ -1884,6 +2465,10 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "url": "{{baseUrl}}/usuarios/{{usuarioId}}"

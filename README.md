@@ -1,6 +1,6 @@
 # Proyecto Integrador 1 - API E-commerce
 
-API REST para una tienda en línea. Incluye la lógica de negocio del catálogo, carrito, checkout, pedidos, reseñas y pagos, con esquemas validados y respuestas JSON.
+API REST para una tienda en línea. Incluye la lógica de negocio del catálogo, carrito, checkout, pedidos, reseñas y pagos, con esquemas validados, autenticación con JWT y respuestas JSON.
 
 ## Tecnologías
 
@@ -9,6 +9,8 @@ API REST para una tienda en línea. Incluye la lógica de negocio del catálogo,
 - MongoDB + Mongoose 6
 - dotenv
 - cors
+- bcryptjs (hash de contraseñas)
+- jsonwebtoken (sesiones)
 - nodemon (desarrollo)
 
 ## Pasos
@@ -36,9 +38,22 @@ Contenido de `.env`:
 ```env
 PORT=5001
 MONGO_URI=mongodb://localhost:27017/nombrebd
+JWT_SECRET=cambia_esta_clave_por_una_larga_y_aleatoria
+JWT_EXPIRA=8h
+ADMIN_NOMBRE=Admin
+ADMIN_CORREO=admin@tienda.com
+ADMIN_CONTRASENNA=Admin123!
 ```
 
-4. Ejecutar el servidor:
+4. Crear el usuario administrador inicial:
+
+```bash
+npm run seed:admin
+```
+
+Crea (o actualiza) un usuario con `rol: admin` usando `ADMIN_CORREO` y `ADMIN_CONTRASENNA`.
+
+5. Ejecutar el servidor:
 
 ```bash
 npm start
@@ -50,11 +65,49 @@ La API queda disponible en `http://localhost:5001`.
 
 El servidor solo inicia si la conexión a MongoDB es exitosa. Si falla, el proceso termina con el error en consola.
 
+## Autenticación
+
+La API usa **JWT**. Los endpoints de login y registro devuelven un `token` que debe enviarse en el header:
+
+```
+Authorization: Bearer <token>
+```
+
+El token dura **8 horas**. El registro siempre crea usuarios con `rol: cliente`; los administradores se crean con `npm run seed:admin`.
+
+### Endpoints de autenticación
+
+| Método | Ruta | Descripción | Acceso | Cuerpo |
+|---|---|---|---|---|
+| POST | `/auth/registro` | Registra un cliente | Público | Ver ejemplo |
+| POST | `/auth/login` | Inicia sesión | Público | `{ "correo": "...", "contrasenna": "..." }` |
+| POST | `/auth/recuperar` | Genera token de recuperación | Público | `{ "correo": "..." }` |
+| POST | `/auth/restablecer` | Cambia la contraseña con el token | Público | `{ "correo": "...", "token": "...", "contrasenna": "..." }` |
+| GET | `/auth/perfil` | Datos del usuario autenticado | Token | — |
+| PUT | `/auth/perfil` | Actualiza el perfil propio | Token | `{ "nombre": "...", "telefono": "...", "direcciones": [] }` |
+| PUT | `/auth/contrasenna` | Cambia la contraseña | Token | `{ "contrasennaActual": "...", "contrasennaNueva": "..." }` |
+
+Registro:
+
+```json
+{
+  "nombre": "Bryan",
+  "apellido": "Monge",
+  "telefono": "8888-7777",
+  "correo": "bryan@example.com",
+  "contrasenna": "Clave123!"
+}
+```
+
+La recuperación es **simulada** (no hay envío de correo): `POST /auth/recuperar` devuelve el token en la respuesta para poder probar el flujo.
+
 ## Endpoints
 
 Base URL: `http://localhost:5001`
 
 ### Usuarios
+
+Todas las rutas requieren **token de administrador**.
 
 | Método | Ruta | Descripción | Cuerpo / parámetros |
 |---|---|---|---|
@@ -93,6 +146,8 @@ Cuerpo para crear o actualizar:
 
 ### Categorías
 
+Las consultas son públicas; crear, editar y eliminar requieren **token de administrador**.
+
 | Método | Ruta | Descripción | Cuerpo / parámetros |
 |---|---|---|---|
 | GET | `/categorias` | Lista categorías | `?estado=true|false`, `?padre=<id>` |
@@ -115,6 +170,8 @@ Cuerpo para crear o actualizar:
 ```
 
 ### Productos
+
+Las consultas son públicas; crear, editar, actualizar stock y eliminar requieren **token de administrador**.
 
 | Método | Ruta | Descripción | Cuerpo / parámetros |
 |---|---|---|---|
@@ -146,6 +203,8 @@ Cuerpo para crear o actualizar:
 
 ### Carrito
 
+Requieren **token**. Cada usuario solo puede operar su propio carrito; un administrador puede operar cualquiera.
+
 | Método | Ruta | Descripción | Cuerpo |
 |---|---|---|---|
 | GET | `/carrito/:usuarioId` | Carrito del usuario (se crea vacío si no existe) | — |
@@ -157,6 +216,8 @@ Cuerpo para crear o actualizar:
 El carrito calcula `subtotal`, `impuestos` (13 %) y `total`, y valida stock al agregar o modificar.
 
 ### Pedidos
+
+Requieren **token**. El listado general y las estadísticas son solo para administradores; el cliente solo accede a sus propios pedidos.
 
 | Método | Ruta | Descripción | Cuerpo / parámetros |
 |---|---|---|---|
@@ -190,7 +251,11 @@ Cuerpo para el checkout:
 }
 ```
 
+Para un cliente el campo `usuario` se ignora y se usa el del token.
+
 ### Reseñas
+
+Las consultas son públicas; crear y editar requieren **token** (solo el autor); eliminar requiere **token de administrador**.
 
 | Método | Ruta | Descripción | Cuerpo / parámetros |
 |---|---|---|---|
@@ -211,7 +276,11 @@ Cuerpo para crear o actualizar:
 }
 ```
 
+Para un cliente el campo `usuario` se ignora y se usa el del token.
+
 ### Pagos
+
+Registrar un pago requiere **token** del dueño del pedido; listar, editar y eliminar requieren **token de administrador**.
 
 | Método | Ruta | Descripción | Cuerpo / parámetros |
 |---|---|---|---|
@@ -242,6 +311,27 @@ Cuerpo para crear o actualizar:
 | 200 | Consulta o actualización exitosa |
 | 201 | Recurso creado |
 | 400 | Datos inválidos o id con formato incorrecto |
+| 401 | Falta el token o es inválido/expirado |
+| 403 | El usuario no tiene permiso para esa acción |
 | 404 | Recurso o referencia no encontrada |
 | 409 | Conflicto (duplicado, stock insuficiente, categoría con productos) |
 | 500 | Error interno del servidor |
+
+Todas las respuestas de error tienen la forma:
+
+```json
+{ "message": "Descripción del error" }
+```
+
+## Colección de Postman
+
+Archivo: `API/postman/ProyectoIntegrador1.postman_collection.json`
+
+1. Ejecutar `npm run seed:admin` (la colección usa el admin para las rutas protegidas).
+2. Abrir Postman → **Import** → seleccionar el archivo.
+3. Verificar la variable `baseUrl` (`http://localhost:5001`).
+4. Ejecutar con **Collection Runner** respetando el orden de las carpetas.
+
+La carpeta **0. Auth** hace login del admin y registra un cliente, y guarda los tokens en las variables `adminToken` y `token`. El resto de las peticiones usan esos tokens automáticamente. Las variables de ids (`usuarioId`, `categoriaId`, `productoId`, `pedidoId`, etc.) también se capturan solas. La carpeta **8. Limpieza** elimina los registros creados.
+
+Incluye casos de éxito y de error (400, 401, 404 y 409) para cada entidad.

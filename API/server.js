@@ -29,6 +29,10 @@ app.use('/pagos', require('./routes/PagoRoutes'));
 
 
 
+mongoose.connection.on('error', (error) => {
+    console.error('MongoDB error:', error.message);
+});
+
 mongoose.connect(process.env.MONGO_URI).then(() => {
     console.log('Connected to MongoDB');
 

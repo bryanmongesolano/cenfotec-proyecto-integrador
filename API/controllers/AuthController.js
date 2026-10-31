@@ -97,6 +97,34 @@ const perfil = async (req, res) => {
     }
 };
 
+const actualizarPerfil = async (req, res) => {
+    try {
+        const usuario = await Usuario.findById(req.usuario._id);
+
+        if (!usuario) {
+            return res.status(404).json({ message: "Usuario no encontrado" });
+        }
+
+        const campos = ['nombre', 'apellido', 'apellido2', 'telefono', 'direcciones'];
+
+        campos.forEach(campo => {
+            if (req.body[campo] !== undefined) {
+                usuario[campo] = req.body[campo];
+            }
+        });
+
+        await usuario.save();
+
+        res.json({
+            mensaje: "Perfil actualizado",
+            datos: usuario
+        });
+    } catch (error) {
+        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
+        res.status(codigo).json({ message: error.message });
+    }
+};
+
 const cambiarContrasenna = async (req, res) => {
     try {
         const { contrasennaActual, contrasennaNueva } = req.body;
@@ -203,4 +231,4 @@ const restablecer = async (req, res) => {
     }
 };
 
-module.exports = { registro, login, perfil, cambiarContrasenna, recuperar, restablecer };
+module.exports = { registro, login, perfil, actualizarPerfil, cambiarContrasenna, recuperar, restablecer };

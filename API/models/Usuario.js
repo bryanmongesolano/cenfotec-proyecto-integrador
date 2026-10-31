@@ -72,6 +72,7 @@ const UsuarioSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
+        minlength: 6,
         select: false
     },
     tokenRecuperacion: {
