@@ -335,3 +335,30 @@ Archivo: `API/postman/ProyectoIntegrador1.postman_collection.json`
 La carpeta **0. Auth** hace login del admin y registra un cliente, y guarda los tokens en las variables `adminToken` y `token`. El resto de las peticiones usan esos tokens automáticamente. Las variables de ids (`usuarioId`, `categoriaId`, `productoId`, `pedidoId`, etc.) también se capturan solas. La carpeta **8. Limpieza** elimina los registros creados.
 
 Incluye casos de éxito y de error (400, 401, 404 y 409) para cada entidad.
+
+## Frontend (Avance 2)
+
+### Matriz de vistas
+
+| Vista | Historia / tarea de Jira | Entidad de la API |
+|---|---|---|
+| `login.html` | PI-1 / PI-25 Inicio de sesión | Usuario (`/auth/login`) |
+| `registro.html` | PI-1 / PI-13 Registro de usuario | Usuario (`/auth/registro`) |
+| `tienda.html` | PI-3 Catálogo, PI-4 Búsqueda, PI-5 Categorías | Producto, Categoría |
+| `producto.html` | PI-6 Detalle, PI-7 Ver/dejar reseña | Producto, Reseña |
+| `carrito.html` | PI-8 Carrito | Carrito |
+| `checkout.html` | PI-9 Checkout y pagos | Pedido, Pago |
+| `productos.html` | PI-11 Admin Productos | Producto |
+| `categorias.html` | PI-5 Admin Categorías | Categoría |
+| `pedidos.html` | PI-12 Admin Pedidos | Pedido |
+| `usuarios.html` | PI-1/PI-2 Admin Usuarios | Usuario |
+| `resennas.html` | PI-7 Admin Reseñas | Reseña |
+| `pagos.html` | PI-9/PI-12 Pagos | Pago |
+
+### Capturas
+
+![Catálogo en escritorio](frontend/public/img/capturas/escritorio-tienda.jpg)
+
+![Catálogo en móvil](frontend/public/img/capturas/movil-tienda.jpg)
+
+Todas las vistas en escritorio y móvil: `frontend/public/capturas.html`.

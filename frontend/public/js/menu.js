@@ -1,45 +1,39 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener('DOMContentLoaded', function () {
+    const menu = document.getElementById('menu');
 
-  const menu = document.getElementById("menu");
+    if (!menu) return;
 
-  if (!menu) return;
+    const usuario = obtenerUsuario();
+    const pagina = location.pathname.split('/').pop() || 'productos.html';
 
-  menu.innerHTML = `
-      <nav class="navbar navbar-expand-sm navbar-light bg-light">
-          <div class="container">
-            <a class="navbar-brand" href="index.html">Proyecto Integrador</a>
-            <button
-              class="navbar-toggler d-lg-none"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#collapsibleNavId"
-              aria-controls="collapsibleNavId"
-              aria-expanded="false"
-              aria-label="Toggle navigation"
-            >
-              <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="collapsibleNavId">
-              <ul class="navbar-nav me-auto mt-2 mt-lg-0">
-                <li class="nav-item">
-                  <a class="nav-link" href="index.html">Inicio</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="usuarios.html">Usuarios</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="productos.html">Productos</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="categorias.html">Categorias</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="pedidos.html">Pedidos</a>
-                </li>
-              </ul>
+    const enlaces = [
+        ['productos.html', 'Productos'],
+        ['categorias.html', 'Categorías'],
+        ['pedidos.html', 'Pedidos'],
+        ['usuarios.html', 'Usuarios'],
+        ['resennas.html', 'Reseñas'],
+        ['pagos.html', 'Pagos']
+    ];
+
+    const items = enlaces.map(([href, texto]) => `
+        <li class="nav-item">
+            <a class="nav-link ${pagina === href ? 'active' : ''}" href="${href}">${texto}</a>
+        </li>`).join('');
+
+    menu.innerHTML = `
+        <nav class="navbar navbar-expand-lg navbar-dark navbar-admin">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="productos.html">Panel Admin</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuAdmin">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="menuAdmin">
+                    <ul class="navbar-nav me-auto">${items}</ul>
+                    <span class="navbar-text text-white me-3">
+                        ${usuario ? esc(usuario.nombre + ' ' + usuario.apellido) : ''}
+                    </span>
+                    <button class="btn btn-outline-light btn-sm" onclick="cerrarSesion()">Salir</button>
+                </div>
             </div>
-          </div>
-        </nav>
-    `;
-
+        </nav>`;
 });

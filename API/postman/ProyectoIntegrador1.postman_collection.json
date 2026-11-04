@@ -700,7 +700,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Tecnologia\",\n  \"descripcion\": \"Equipos y accesorios\",\n  \"icono\": \"laptop\",\n  \"estado\": true\n}",
+              "raw": "{\n  \"nombre\": \"Tecnologia\",\n  \"descripcion\": \"Equipos y accesorios\",\n  \"estado\": true,\n  \"icono\": \"laptop\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -743,7 +743,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Audio\",\n  \"descripcion\": \"Audifonos y parlantes\",\n  \"icono\": \"headphones\",\n  \"padre\": \"{{categoriaId}}\"\n}",
+              "raw": "{\n  \"nombre\": \"Audio\",\n  \"descripcion\": \"Audifonos y parlantes\",\n  \"padre\": \"{{categoriaId}}\",\n  \"icono\": \"headphones\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
