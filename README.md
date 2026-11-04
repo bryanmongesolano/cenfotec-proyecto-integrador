@@ -357,8 +357,33 @@ Incluye casos de éxito y de error (400, 401, 404 y 409) para cada entidad.
 
 ### Capturas
 
-![Catálogo en escritorio](frontend/public/img/capturas/escritorio-tienda.jpg)
+#### Tienda
 
-![Catálogo en móvil](frontend/public/img/capturas/movil-tienda.jpg)
+![Tienda en escritorio](frontend/public/img/capturas/escritorio-tienda.jpg)
 
-Todas las vistas en escritorio y móvil: `frontend/public/capturas.html`.
+![Tienda en móvil](frontend/public/img/capturas/movil-tienda.jpg)
+
+#### Carrito
+
+![Carrito en escritorio](frontend/public/img/capturas/escritorio-carrito.jpg)
+
+![Carrito en móvil](frontend/public/img/capturas/movil-carrito.jpg)
+
+#### Checkout
+
+![Checkout en escritorio](frontend/public/img/capturas/escritorio-checkout.jpg)
+
+![Checkout en móvil](frontend/public/img/capturas/movil-checkout.jpg)
+
+#### Panel admin — Productos
+
+![Productos en escritorio](frontend/public/img/capturas/escritorio-productos.jpg)
+
+![Productos en móvil](frontend/public/img/capturas/movil-productos.jpg)
+
+#### Login
+
+![Login en escritorio](frontend/public/img/capturas/escritorio-login.jpg)
+
+![Login en móvil](frontend/public/img/capturas/movil-login.jpg)
+
