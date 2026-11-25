@@ -251,10 +251,10 @@ function renderizarUltimosPedidos(pedidos) {
         const cliente = p.usuario ? `${p.usuario.nombre} ${p.usuario.apellido}` : '—';
         return `
             <tr>
-                <td><strong class="text-primary">${esc(p.numero)}</strong></td>
+                <td class="text-primary">${esc(p.numero)}</td>
                 <td>${esc(cliente)}</td>
-                <td class="small text-muted">${esc(fechaCorta(p.fecha))}</td>
-                <td class="text-end fw-semibold tabular-nums">${moneda(p.total)}</td>
+                <td class="text-muted">${esc(fechaCorta(p.fecha))}</td>
+                <td class="text-end tabular-nums">${moneda(p.total)}</td>
                 <td>${badgePedido(p.estado)}</td>
                 <td class="text-end">
                     <button type="button" class="btn btn-sm btn-light border" data-ver-pedido="${p._id}" title="Ver detalle">
@@ -276,8 +276,8 @@ function renderizarStockBajo(productos) {
     tbody.innerHTML = productos.slice(0, 7).map(p => `
         <tr>
             <td>
-                <div class="fw-semibold small">${esc(p.nombre)}</div>
-                <small class="text-muted">${esc(p.sku || 'Sin SKU')} · Mín: ${p.stockMinimo ?? 0}</small>
+                <div>${esc(p.nombre)}</div>
+                <div class="text-muted">${esc(p.sku || 'Sin SKU')} · Mín: ${p.stockMinimo ?? 0}</div>
             </td>
             <td class="text-center"><span class="badge rounded-pill bg-danger">${p.stock}</span></td>
             <td class="text-end">

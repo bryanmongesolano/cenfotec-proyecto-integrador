@@ -80,8 +80,8 @@ function pintar() {
 
         return `
             <tr>
-                <td class="fw-semibold">${esc(c.nombre)}</td>
-                <td>${c.padre && c.padre.nombre ? `<span class="badge bg-light text-dark border">${esc(c.padre.nombre)}</span>` : '<span class="text-muted small">Principal</span>'}</td>
+                <td>${esc(c.nombre)}</td>
+                <td>${c.padre && c.padre.nombre ? `<span class="badge bg-light text-dark border">${esc(c.padre.nombre)}</span>` : '<span class="text-muted">Principal</span>'}</td>
                 <td class="text-center">
                     <a href="productos.html?categoria=${encodeURIComponent(c._id)}" class="badge rounded-pill bg-light text-primary border text-decoration-none">
                         ${totalProds} producto${totalProds === 1 ? '' : 's'}

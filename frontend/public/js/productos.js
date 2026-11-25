@@ -116,21 +116,21 @@ function pintar() {
         const esBajo = p.stock <= (p.stockMinimo || 0);
         const stockHtml = esBajo
             ? `<span class="badge rounded-pill bg-danger">${p.stock}</span>`
-            : `<span class="fw-semibold">${p.stock}</span>`;
+            : `${p.stock}`;
         const meta = [p.sku ? `SKU: ${p.sku}` : '', p.marca || ''].filter(Boolean).join(' · ');
 
         return `
             <tr>
                 <td>${imagen}</td>
                 <td>
-                    <div class="fw-semibold">${esc(p.nombre)}</div>
+                    <div>${esc(p.nombre)}</div>
                     <div class="d-flex flex-wrap gap-1 align-items-center mt-1">
-                        ${meta ? `<small class="text-muted me-1">${esc(meta)}</small>` : ''}
+                        ${meta ? `<span class="text-muted me-1">${esc(meta)}</span>` : ''}
                         ${p.destacado ? '<span class="badge bg-primary-subtle text-primary">Destacado</span>' : ''}
                     </div>
                 </td>
                 <td><span class="badge bg-light text-dark border">${esc(categoria)}</span></td>
-                <td class="text-end fw-semibold">${moneda(p.precio)}</td>
+                <td class="text-end">${moneda(p.precio)}</td>
                 <td class="text-end">${stockHtml}</td>
                 <td>
                     <button type="button" class="btn btn-sm p-0 border-0 bg-transparent" data-accion="toggleEstado" data-id="${p._id}" title="Cambiar estado">

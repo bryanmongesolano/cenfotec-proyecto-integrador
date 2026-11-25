@@ -68,7 +68,7 @@ function pintar() {
             ? `<div class="mt-1">${badgePedido(p.pedido.estado)}</div>`
             : '';
 
-        let comprobante = '<span class="text-muted small">Sin comprobante</span>';
+        let comprobante = '<span class="text-muted">Sin comprobante</span>';
         if (p.comprobante) {
             comprobante = /^https?:\/\//i.test(p.comprobante)
                 ? `<a href="${esc(p.comprobante)}" target="_blank" rel="noopener" class="btn btn-sm btn-link p-0 text-decoration-none"><i class="bi bi-box-arrow-up-right me-1"></i>Ver enlace</a>`
@@ -80,7 +80,7 @@ function pintar() {
         return `
             <tr>
                 <td>
-                    <strong class="text-primary">${esc(pedidoNum)}</strong>
+                    <div class="text-primary">${esc(pedidoNum)}</div>
                     ${estadoPedido}
                 </td>
                 <td>
@@ -88,10 +88,10 @@ function pintar() {
                         <i class="bi bi-${iconoMetodo} me-1"></i>${esc(p.metodo)}
                     </span>
                 </td>
-                <td class="text-end fw-semibold tabular-nums">${moneda(p.monto)}</td>
+                <td class="text-end tabular-nums">${moneda(p.monto)}</td>
                 <td>${badgePago(p.estado)}</td>
                 <td>${comprobante}</td>
-                <td class="small text-muted">${fecha(p.fecha)}</td>
+                <td class="text-muted">${fecha(p.fecha)}</td>
                 <td class="text-end text-nowrap">
                     <div class="btn-group btn-group-sm">
                         <button class="btn btn-outline-success" data-accion="aprobar" data-id="${p._id}" ${p.estado === 'aprobado' ? 'disabled' : ''} title="Aprobar pago">

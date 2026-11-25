@@ -71,27 +71,19 @@ function pintar() {
     }
 
     tabla.innerHTML = paginaItems.map(u => {
-        const iniciales = inicialesUsuario(u.nombre, u.apellido);
+        const nombreCompleto = [u.nombre, u.apellido, u.apellido2].filter(Boolean).join(' ');
         const rolBadge = u.rol === 'admin'
             ? '<span class="badge rounded-pill bg-dark"><i class="bi bi-shield-lock me-1"></i>Admin</span>'
             : '<span class="badge rounded-pill bg-light text-dark border">Cliente</span>';
 
         return `
             <tr>
+                <td>${esc(nombreCompleto)}</td>
                 <td>
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="rounded-circle bg-primary text-white fw-bold d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width: 34px; height: 34px; font-size: 0.78rem;">${esc(iniciales)}</span>
-                        <div>
-                            <div class="fw-semibold">${esc(u.nombre + ' ' + u.apellido)}</div>
-                            ${u.apellido2 ? `<small class="text-muted">${esc(u.apellido2)}</small>` : ''}
-                        </div>
-                    </div>
+                    <div>${esc(u.correo)}</div>
+                    <div class="text-muted">${esc(u.telefono || 'Sin teléfono')}</div>
                 </td>
-                <td>
-                    <div class="small">${esc(u.correo)}</div>
-                    <small class="text-muted">${esc(u.telefono || 'Sin teléfono')}</small>
-                </td>
-                <td class="small">${esc(u.cedula || '—')}</td>
+                <td>${esc(u.cedula || '—')}</td>
                 <td>${rolBadge}</td>
                 <td>
                     <button type="button" class="btn btn-sm p-0 border-0 bg-transparent" data-accion="toggleEstado" data-id="${u._id}" title="Cambiar estado">
@@ -165,8 +157,8 @@ async function verDetalleUsuario(id) {
                 <tbody>
                     ${pedidosUsuario.slice(0, 8).map(p => `
                         <tr>
-                            <td class="fw-semibold">${esc(p.numero)}</td>
-                            <td class="small text-muted">${fechaCorta(p.fecha)}</td>
+                            <td>${esc(p.numero)}</td>
+                            <td class="text-muted">${fechaCorta(p.fecha)}</td>
                             <td class="text-end tabular-nums">${moneda(p.total)}</td>
                             <td>${badgePedido(p.estado)}</td>
                         </tr>`).join('')}

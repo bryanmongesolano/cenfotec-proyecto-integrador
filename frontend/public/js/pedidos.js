@@ -77,16 +77,16 @@ function pintar() {
         return `
             <tr>
                 <td>
-                    <strong class="text-primary">${esc(p.numero)}</strong>
+                    <div class="text-primary">${esc(p.numero)}</div>
                     ${p.codigoCupon ? `<div><span class="badge bg-success-subtle text-success">${esc(p.codigoCupon)}</span></div>` : ''}
                 </td>
                 <td>
-                    <div class="fw-medium">${esc(cliente)}</div>
-                    ${p.usuario && p.usuario.correo ? `<small class="text-muted">${esc(p.usuario.correo)}</small>` : ''}
+                    <div>${esc(cliente)}</div>
+                    ${p.usuario && p.usuario.correo ? `<div class="text-muted">${esc(p.usuario.correo)}</div>` : ''}
                 </td>
-                <td class="small text-muted">${fecha(p.fecha)}</td>
-                <td class="text-capitalize small">${esc(p.metodoPago || '—')}</td>
-                <td class="text-end fw-semibold">${moneda(p.total)}</td>
+                <td class="text-muted">${fecha(p.fecha)}</td>
+                <td class="text-capitalize">${esc(p.metodoPago || '—')}</td>
+                <td class="text-end">${moneda(p.total)}</td>
                 <td>${badgePedido(p.estado)}</td>
                 <td class="text-end text-nowrap">
                     <div class="btn-group btn-group-sm">

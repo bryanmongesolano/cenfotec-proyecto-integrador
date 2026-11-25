@@ -70,13 +70,13 @@ function pintar() {
             <tr>
                 <td>
                     ${prodId
-                        ? `<a href="producto.html?id=${esc(prodId)}" target="_blank" class="fw-semibold text-decoration-none">${esc(producto)}</a>`
-                        : `<span class="fw-semibold">${esc(producto)}</span>`}
+                        ? `<a href="producto.html?id=${esc(prodId)}" target="_blank" class="text-decoration-none">${esc(producto)}</a>`
+                        : `<span>${esc(producto)}</span>`}
                 </td>
-                <td class="small">${esc(cliente)}</td>
-                <td class="text-nowrap">${estrellas(r.calificacion)} <span class="small text-muted">(${r.calificacion})</span></td>
-                <td class="small" style="max-width: 320px;">${esc(r.comentario)}</td>
-                <td class="small text-muted text-nowrap">${fechaCorta(r.fecha)}</td>
+                <td>${esc(cliente)}</td>
+                <td class="text-nowrap">${estrellas(r.calificacion)} <span class="text-muted">(${r.calificacion})</span></td>
+                <td style="max-width: 320px;">${esc(r.comentario)}</td>
+                <td class="text-muted text-nowrap">${fechaCorta(r.fecha)}</td>
                 <td class="text-end">
                     <button class="btn btn-sm btn-outline-danger" data-accion="eliminar" data-id="${r._id}" title="Eliminar reseña">
                         <i class="bi bi-trash"></i>

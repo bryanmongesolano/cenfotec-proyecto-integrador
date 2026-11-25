@@ -72,30 +72,19 @@ function pintar() {
     }
 
     tabla.innerHTML = paginaItems.map(c => {
-        const descuentoTexto = c.tipo === 'porcentaje' ? `${c.valor}% OFF` : `${moneda(c.valor)} OFF`;
+        const descuentoTexto = c.tipo === 'porcentaje' ? `${c.valor}%` : moneda(c.valor);
         const usosTexto = c.usosMaximos > 0 ? `${c.usosActuales || 0} / ${c.usosMaximos}` : `${c.usosActuales || 0} / ∞`;
-        const pctUsos = c.usosMaximos > 0 ? Math.min(100, Math.round(((c.usosActuales || 0) / c.usosMaximos) * 100)) : 0;
         const expirado = c.fechaExpiracion && new Date(c.fechaExpiracion) < new Date();
         const vigenciaHtml = c.fechaExpiracion
-            ? `<span class="${expirado ? 'text-danger fw-semibold' : 'text-muted'} small">${expirado ? 'Expiró ' : 'Hasta '}${fechaCorta(c.fechaExpiracion)}</span>`
-            : '<span class="text-muted small">Sin vencimiento</span>';
+            ? `<span class="${expirado ? 'text-danger' : 'text-muted'}">${expirado ? 'Expiró ' : 'Hasta '}${fechaCorta(c.fechaExpiracion)}</span>`
+            : '<span class="text-muted">Sin vencimiento</span>';
 
         return `
             <tr>
-                <td>
-                    <div class="d-flex align-items-center gap-2">
-                        <button type="button" class="btn btn-sm btn-light border font-monospace fw-bold text-primary py-0 px-2" data-accion="copiar" data-codigo="${esc(c.codigo)}" title="Copiar código">
-                            ${esc(c.codigo)} <i class="bi bi-clipboard ms-1 small"></i>
-                        </button>
-                    </div>
-                    ${c.descripcion ? `<small class="text-muted d-block mt-1">${esc(c.descripcion)}</small>` : ''}
-                </td>
-                <td><span class="badge bg-primary-subtle text-primary fs-6 fw-semibold">${esc(descuentoTexto)}</span></td>
-                <td class="small tabular-nums">${c.montoMinimo > 0 ? moneda(c.montoMinimo) : '<span class="text-muted">Sin mínimo</span>'}</td>
-                <td style="min-width: 110px;">
-                    <div class="small fw-medium">${usosTexto}</div>
-                    ${c.usosMaximos > 0 ? `<div class="progress mt-1" style="height: 5px;"><div class="progress-bar ${pctUsos >= 100 ? 'bg-danger' : 'bg-primary'}" style="width: ${pctUsos}%"></div></div>` : ''}
-                </td>
+                <td class="font-monospace">${esc(c.codigo)}</td>
+                <td class="tabular-nums">${esc(descuentoTexto)}</td>
+                <td class="tabular-nums">${c.montoMinimo > 0 ? moneda(c.montoMinimo) : '<span class="text-muted">Sin mínimo</span>'}</td>
+                <td>${usosTexto}</td>
                 <td>${vigenciaHtml}</td>
                 <td>
                     <button type="button" class="btn btn-sm p-0 border-0 bg-transparent" data-accion="toggleEstado" data-id="${c._id}">
@@ -184,11 +173,6 @@ async function manejarAccion(evento) {
 
     const accion = boton.dataset.accion;
     const id = boton.dataset.id;
-
-    if (accion === 'copiar') {
-        await copiarTexto(boton.dataset.codigo || '', 'Código de cupón copiado');
-        return;
-    }
 
     if (accion === 'editar') {
         abrirEditar(id);
