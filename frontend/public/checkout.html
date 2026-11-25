@@ -3,22 +3,31 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Checkout</title>
+    <title>Checkout - Mundo Trendy</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="css/styles.css" />
   </head>
 
-  <body>
+  <body class="bg-body-tertiary">
     <header>
       <div id="menu"></div>
     </header>
 
     <main class="container py-4">
-      <div id="alerta"></div>
-      <h1 class="h3 mb-3">Checkout</h1>
+      <div id="mensajeSpinner"></div>
+      <div id="modalMensajes"></div>
+
+      <div class="mb-4">
+        <h1 class="h3 fw-bold mb-1">Finalizar compra</h1>
+        <small class="text-muted">Completá tu entrega y pago de forma segura</small>
+      </div>
 
       <div id="contenido"></div>
     </main>
@@ -28,6 +37,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/config.js"></script>
     <script src="js/sesion.js"></script>
+    <script src="js/misc.js"></script>
     <script src="js/api.js"></script>
     <script src="js/menuTienda.js"></script>
     <script src="js/checkout.js"></script>

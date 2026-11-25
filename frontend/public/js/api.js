@@ -1,54 +1,65 @@
 async function apiFetch(ruta, opciones = {}) {
+    const { silencioso = false, ...fetchOpciones } = opciones;
     const headers = {
         'Content-Type': 'application/json',
-        ...(opciones.headers || {})
+        ...(fetchOpciones.headers || {})
     };
 
     const token = obtenerToken();
+    if (token) headers.Authorization = 'Bearer ' + token;
 
-    if (token) {
-        headers.Authorization = 'Bearer ' + token;
-    }
+    if (!silencioso) mostrarSpinner();
 
-    const respuesta = await fetch(API.BASE + ruta, { ...opciones, headers });
-
-    let datos = null;
     try {
-        datos = await respuesta.json();
-    } catch (error) { }
+        const respuesta = await fetch(API.BASE + ruta, { ...fetchOpciones, headers });
+        const datos = await respuesta.json().catch(() => null);
 
-    if (respuesta.status === 401) {
-        cerrarSesion();
-        throw new Error('La sesión expiró');
+        if (respuesta.status === 401 && token) {
+            if (silencioso) {
+                limpiarSesionLocal();
+            } else {
+                cerrarSesion({ expirada: true });
+            }
+            throw new Error('La sesión expiró');
+        }
+
+        if (!respuesta.ok) {
+            throw new Error(datos && datos.message ? datos.message : 'Error ' + respuesta.status);
+        }
+
+        return datos;
+    } finally {
+        if (!silencioso) ocultarSpinner();
     }
-
-    if (!respuesta.ok) {
-        throw new Error(datos && datos.message ? datos.message : 'Error ' + respuesta.status);
-    }
-
-    return datos;
 }
 
-async function apiPublica(ruta) {
-    const respuesta = await fetch(API.BASE + ruta);
-    const datos = await respuesta.json().catch(() => null);
+async function apiPublica(ruta, opciones = {}) {
+    const { silencioso = false } = opciones;
+    if (!silencioso) mostrarSpinner();
 
-    if (!respuesta.ok) {
-        throw new Error(datos && datos.message ? datos.message : 'Error ' + respuesta.status);
+    try {
+        const respuesta = await fetch(API.BASE + ruta);
+        const datos = await respuesta.json().catch(() => null);
+
+        if (!respuesta.ok) {
+            throw new Error(datos && datos.message ? datos.message : 'Error ' + respuesta.status);
+        }
+
+        return datos;
+    } finally {
+        if (!silencioso) ocultarSpinner();
     }
-
-    return datos;
 }
 
-function esc(texto) {    if (texto === null || texto === undefined) return '';
-
-    return String(texto).replace(/[&<>"']/g, caracter => ({
+function esc(texto) {
+    if (texto === null || texto === undefined) return '';
+    return String(texto).replace(/[&<>"']/g, c => ({
         '&': '&amp;',
         '<': '&lt;',
         '>': '&gt;',
         '"': '&quot;',
         "'": '&#39;'
-    }[caracter]));
+    }[c]));
 }
 
 function moneda(valor) {
@@ -61,47 +72,63 @@ function moneda(valor) {
 
 function fecha(valor) {
     if (!valor) return '—';
-
     const d = new Date(valor);
+    return isNaN(d.getTime()) ? '—' : d.toLocaleString('es-CR', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
 
-    return isNaN(d.getTime()) ? '—' : d.toLocaleString('es-CR');
+function fechaCorta(valor) {
+    if (!valor) return '—';
+    const d = new Date(valor);
+    return isNaN(d.getTime()) ? '—' : d.toLocaleDateString('es-CR', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+    });
 }
 
 function mostrarAlerta(mensaje, tipo = 'success') {
-    const contenedor = document.getElementById('alerta');
+    mostrarToast(mensaje, tipo);
+}
 
-    if (!contenedor) {
-        alert(mensaje);
-        return;
-    }
-
-    contenedor.innerHTML = `<div class="alert alert-${tipo} py-2">${esc(mensaje)}</div>`;
-
-    setTimeout(() => {
-        contenedor.innerHTML = '';
-    }, 4000);
+function crearBadgeEstado(color, icono, texto) {
+    return `<span class="badge rounded-pill bg-${color}-subtle text-${color}-emphasis border border-${color}-subtle px-2 py-1"><i class="bi bi-${icono} me-1" aria-hidden="true"></i>${esc(texto)}</span>`;
 }
 
 function badgePedido(estado) {
-    const colores = {
-        pendiente: 'warning',
-        pagado: 'info',
-        enviado: 'primary',
-        entregado: 'success',
-        cancelado: 'danger'
+    const mapa = {
+        pendiente: ['warning', 'clock', 'Pendiente'],
+        pagado: ['info', 'check2-circle', 'Pagado'],
+        enviado: ['primary', 'truck', 'Enviado'],
+        entregado: ['success', 'box-seam', 'Entregado'],
+        cancelado: ['danger', 'x-circle', 'Cancelado']
     };
+    const [color, icono, texto] = mapa[estado] || ['secondary', 'circle', estado || 'Desconocido'];
+    return crearBadgeEstado(color, icono, texto);
+}
 
-    return `<span class="badge bg-${colores[estado] || 'secondary'}">${esc(estado)}</span>`;
+function badgePago(estado) {
+    const mapa = {
+        pendiente: ['warning', 'hourglass-split', 'Pendiente'],
+        aprobado: ['success', 'check-circle', 'Aprobado'],
+        rechazado: ['danger', 'x-octagon', 'Rechazado']
+    };
+    const [color, icono, texto] = mapa[estado] || ['secondary', 'circle', estado || 'Desconocido'];
+    return crearBadgeEstado(color, icono, texto);
 }
 
 function badgeActivo(estado) {
     return estado
-        ? '<span class="badge bg-success">Activo</span>'
-        : '<span class="badge bg-secondary">Inactivo</span>';
+        ? crearBadgeEstado('success', 'check-circle-fill', 'Activo')
+        : crearBadgeEstado('secondary', 'dash-circle-fill', 'Inactivo');
 }
 
 function estrellas(cantidad) {
-    const total = Number(cantidad) || 0;
-
-    return '<span class="stars">' + '★'.repeat(total) + '☆'.repeat(5 - total) + '</span>';
+    const total = Math.max(0, Math.min(5, Math.round(Number(cantidad) || 0)));
+    return `<span class="stars" aria-label="${total} de 5 estrellas">${'★'.repeat(total)}${'☆'.repeat(5 - total)}</span>`;
 }

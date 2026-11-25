@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Usuario = require('../models/Usuario');
+const { responderError } = require('../utils/errores');
 
 function generarToken(usuario) {
     return jwt.sign(
@@ -21,17 +22,25 @@ function usuarioSeguro(usuario) {
 
 const registro = async (req, res) => {
     try {
-        const usuario = new Usuario({
+        const datosUsuario = {
             nombre: req.body.nombre,
             apellido: req.body.apellido,
             apellido2: req.body.apellido2,
-            cedula: req.body.cedula,
-            telefono: req.body.telefono,
             correo: req.body.correo,
             contrasenna: req.body.contrasenna,
             direcciones: req.body.direcciones,
             rol: 'cliente'
-        });
+        };
+
+        if (req.body.cedula && String(req.body.cedula).trim()) {
+            datosUsuario.cedula = String(req.body.cedula).trim();
+        }
+
+        if (req.body.telefono && String(req.body.telefono).trim()) {
+            datosUsuario.telefono = String(req.body.telefono).trim();
+        }
+
+        const usuario = new Usuario(datosUsuario);
 
         const usuarioGuardado = await usuario.save();
         const token = generarToken(usuarioGuardado);
@@ -44,14 +53,14 @@ const registro = async (req, res) => {
             }
         })
     } catch (error) {
-        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
-        res.status(codigo).json({ message: error.message });
+        responderError(res, error);
     }
 };
 
 const login = async (req, res) => {
     try {
-        const { correo, contrasenna } = req.body;
+        const correo = typeof req.body.correo === 'string' ? req.body.correo.trim().toLowerCase() : '';
+        const { contrasenna } = req.body;
 
         if (!correo || !contrasenna) {
             return res.status(400).json({ message: "El correo y la contraseña son obligatorios" });
@@ -59,7 +68,7 @@ const login = async (req, res) => {
 
         const usuario = await Usuario.findOne({ correo }).select('+contrasenna');
 
-        if (!usuario) {
+        if (!usuario || !usuario.contrasenna) {
             return res.status(401).json({ message: "Correo o contraseña incorrectos" });
         }
 
@@ -83,8 +92,7 @@ const login = async (req, res) => {
             }
         });
     } catch (error) {
-        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
-        res.status(codigo).json({ message: error.message });
+        responderError(res, error);
     }
 };
 
@@ -92,8 +100,7 @@ const perfil = async (req, res) => {
     try {
         res.json(req.usuario);
     } catch (error) {
-        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
-        res.status(codigo).json({ message: error.message });
+        responderError(res, error);
     }
 };
 
@@ -105,11 +112,17 @@ const actualizarPerfil = async (req, res) => {
             return res.status(404).json({ message: "Usuario no encontrado" });
         }
 
-        const campos = ['nombre', 'apellido', 'apellido2', 'telefono', 'direcciones'];
+        const campos = ['nombre', 'apellido', 'apellido2', 'cedula', 'telefono', 'direcciones'];
 
         campos.forEach(campo => {
             if (req.body[campo] !== undefined) {
-                usuario[campo] = req.body[campo];
+                if ((campo === 'telefono' || campo === 'cedula') && String(req.body[campo]).trim() === '') {
+                    usuario[campo] = undefined;
+                } else if (campo === 'telefono' || campo === 'cedula') {
+                    usuario[campo] = String(req.body[campo]).trim();
+                } else {
+                    usuario[campo] = req.body[campo];
+                }
             }
         });
 
@@ -120,8 +133,7 @@ const actualizarPerfil = async (req, res) => {
             datos: usuario
         });
     } catch (error) {
-        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
-        res.status(codigo).json({ message: error.message });
+        responderError(res, error);
     }
 };
 
@@ -143,6 +155,10 @@ const cambiarContrasenna = async (req, res) => {
             return res.status(404).json({ message: "Usuario no encontrado" });
         }
 
+        if (!usuario.contrasenna) {
+            return res.status(400).json({ message: "El usuario no tiene una contraseña configurada" });
+        }
+
         const coincide = await bcrypt.compare(contrasennaActual, usuario.contrasenna);
 
         if (!coincide) {
@@ -154,14 +170,13 @@ const cambiarContrasenna = async (req, res) => {
 
         res.json({ mensaje: "Contraseña actualizada" });
     } catch (error) {
-        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
-        res.status(codigo).json({ message: error.message });
+        responderError(res, error);
     }
 };
 
 const recuperar = async (req, res) => {
     try {
-        const { correo } = req.body;
+        const correo = typeof req.body.correo === 'string' ? req.body.correo.trim().toLowerCase() : '';
 
         if (!correo) {
             return res.status(400).json({ message: "El correo es obligatorio" });
@@ -180,20 +195,19 @@ const recuperar = async (req, res) => {
 
         await usuario.save();
 
-        // Simulación del envío de correo: el token se devuelve en la respuesta
         res.json({
             mensaje: "Token de recuperación generado",
             datos: { token }
         });
     } catch (error) {
-        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
-        res.status(codigo).json({ message: error.message });
+        responderError(res, error);
     }
 };
 
 const restablecer = async (req, res) => {
     try {
-        const { correo, token, contrasenna } = req.body;
+        const correo = typeof req.body.correo === 'string' ? req.body.correo.trim().toLowerCase() : '';
+        const { token, contrasenna } = req.body;
 
         if (!correo || !token || !contrasenna) {
             return res.status(400).json({ message: "El correo, el token y la nueva contraseña son obligatorios" });
@@ -226,8 +240,7 @@ const restablecer = async (req, res) => {
 
         res.json({ mensaje: "Contraseña restablecida" });
     } catch (error) {
-        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
-        res.status(codigo).json({ message: error.message });
+        responderError(res, error);
     }
 };
 

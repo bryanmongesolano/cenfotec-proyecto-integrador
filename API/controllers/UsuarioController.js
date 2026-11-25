@@ -1,93 +1,76 @@
 const Usuario = require('../models/Usuario');
+const { responderError } = require('../utils/errores');
+
+function sinContrasenna(usuario) {
+    const datos = usuario.toObject();
+    delete datos.contrasenna;
+    return datos;
+}
 
 const listar = async (req, res) => {
     try {
         const usuarios = await Usuario.find();
         res.json(usuarios);
     } catch (error) {
-        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
-        res.status(codigo).json({ message: error.message });
+        responderError(res, error);
     }
 };
 
 const obtener = async (req, res) => {
     try {
         const usuario = await Usuario.findById(req.params.id);
-
         if (!usuario) {
-            return res.status(404).json({ message: "Usuario no encontrado" + req.params.id });
+            return res.status(404).json({ message: 'Usuario no encontrado: ' + req.params.id });
         }
-
         res.json(usuario);
     } catch (error) {
-        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
-        res.status(codigo).json({ message: error.message });
+        responderError(res, error);
     }
 };
 
 const crear = async (req, res) => {
     try {
-        const usuario = new Usuario(req.body);
+        const datosEntrada = { ...req.body };
+        if (datosEntrada.cedula !== undefined && String(datosEntrada.cedula).trim() === '') delete datosEntrada.cedula;
+        if (datosEntrada.telefono !== undefined && String(datosEntrada.telefono).trim() === '') delete datosEntrada.telefono;
 
-        const usuarioGuardado = await usuario.save();
-        const datos = usuarioGuardado.toObject();
-        delete datos.contrasenna;
-
-        res.status(201).json({
-            mensaje: "Usuario creado",
-            datos
-        })
+        const usuarioGuardado = await new Usuario(datosEntrada).save();
+        res.status(201).json({ mensaje: 'Usuario creado', datos: sinContrasenna(usuarioGuardado) });
     } catch (error) {
-        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
-        res.status(codigo).json({ message: error.message });
+        responderError(res, error);
     }
 };
 
 const actualizar = async (req, res) => {
     try {
         const usuario = await Usuario.findById(req.params.id);
-
         if (!usuario) {
-            return res.status(404).json({ message: "Usuario no encontrado" + req.params.id });
+            return res.status(404).json({ message: 'Usuario no encontrado: ' + req.params.id });
         }
 
-        Object.assign(usuario, req.body);
+        const cambios = { ...req.body };
+        if (cambios.cedula !== undefined && String(cambios.cedula).trim() === '') cambios.cedula = undefined;
+        if (cambios.telefono !== undefined && String(cambios.telefono).trim() === '') cambios.telefono = undefined;
+        if (cambios.contrasenna !== undefined && String(cambios.contrasenna).trim() === '') delete cambios.contrasenna;
+
+        Object.assign(usuario, cambios);
         await usuario.save();
 
-        const datos = usuario.toObject();
-        delete datos.contrasenna;
-
-        res.json(
-            {
-                mensaje: "Usuario actualizado",
-                datos
-            }
-        );
+        res.json({ mensaje: 'Usuario actualizado', datos: sinContrasenna(usuario) });
     } catch (error) {
-        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
-        res.status(codigo).json({ message: error.message });
+        responderError(res, error);
     }
 };
 
 const eliminar = async (req, res) => {
     try {
-        const usuario = await Usuario.findByIdAndDelete(
-            req.params.id,
-        );
-
+        const usuario = await Usuario.findByIdAndDelete(req.params.id);
         if (!usuario) {
-            return res.status(404).json({ message: "Usuario no encontrado" + req.params.id });
+            return res.status(404).json({ message: 'Usuario no encontrado: ' + req.params.id });
         }
-
-        res.json(
-            {
-                mensaje: "Usuario eliminado",
-                datos: req.params.id
-            }
-        );
+        res.json({ mensaje: 'Usuario eliminado', datos: req.params.id });
     } catch (error) {
-        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
-        res.status(codigo).json({ message: error.message });
+        responderError(res, error);
     }
 };
 

@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mi cuenta - Mundo Trendy</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+
+  <body class="bg-body-tertiary">
+    <header><div id="menu"></div></header>
+
+    <main class="container py-4">
+      <div id="mensajeSpinner"></div>
+      <div id="modalMensajes"></div>
+
+      <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small">
+          <li class="breadcrumb-item"><a href="tienda.html">Inicio</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Mi cuenta</li>
+        </ol>
+      </nav>
+
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4 d-flex align-items-center gap-3">
+          <span class="rounded-circle bg-primary text-white fw-bold d-inline-flex align-items-center justify-content-center flex-shrink-0 fs-5" style="width: 54px; height: 54px;" id="avatarPerfil">U</span>
+          <div>
+            <h1 class="h4 fw-bold mb-0" id="tituloUsuario">Mi cuenta</h1>
+            <small class="text-muted" id="subtituloUsuario"></small>
+          </div>
+        </div>
+      </div>
+
+      <ul class="nav nav-pills gap-2 mb-4" id="tabsCuenta" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active fw-semibold" id="tab-pedidos-btn" data-bs-toggle="tab" data-bs-target="#tabPedidos" type="button" role="tab">
+            <i class="bi bi-bag me-1" aria-hidden="true"></i>Mis pedidos
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link fw-semibold" id="tab-favoritos-btn" data-bs-toggle="tab" data-bs-target="#tabFavoritos" type="button" role="tab">
+            <i class="bi bi-heart me-1" aria-hidden="true"></i>Mis favoritos
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link fw-semibold" id="tab-datos-btn" data-bs-toggle="tab" data-bs-target="#tabDatos" type="button" role="tab">
+            <i class="bi bi-person me-1" aria-hidden="true"></i>Datos y direcciones
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link fw-semibold" id="tab-clave-btn" data-bs-toggle="tab" data-bs-target="#tabClave" type="button" role="tab">
+            <i class="bi bi-shield-lock me-1" aria-hidden="true"></i>Seguridad
+          </button>
+        </li>
+      </ul>
+
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="tabPedidos" role="tabpanel">
+          <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+              <span class="fw-bold">Historial de pedidos</span>
+              <select class="form-select form-select-sm" id="filtroEstadoMiPedido" style="max-width: 200px;">
+                <option value="">Todos los estados</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="pagado">Pagado</option>
+                <option value="enviado">Enviado</option>
+                <option value="entregado">Entregado</option>
+                <option value="cancelado">Cancelado</option>
+              </select>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Pedido</th>
+                    <th>Fecha</th>
+                    <th>Artículos</th>
+                    <th>Método</th>
+                    <th class="text-end">Total</th>
+                    <th>Estado</th>
+                    <th class="text-end">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tablaMisPedidos"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="tabFavoritos" role="tabpanel">
+          <div id="grillaFavoritos" class="row g-3"></div>
+        </div>
+
+        <div class="tab-pane fade" id="tabDatos" role="tabpanel">
+          <div class="row g-4">
+            <div class="col-12 col-lg-6">
+              <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                  <h2 class="h5 fw-bold mb-3">Información personal</h2>
+                  <form id="formPerfil">
+                    <div class="row g-3">
+                      <div class="col-12 col-md-6">
+                        <label class="form-label small" for="pNombre">Nombre</label>
+                        <input type="text" class="form-control" id="pNombre" required />
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label class="form-label small" for="pApellido">Primer apellido</label>
+                        <input type="text" class="form-control" id="pApellido" required />
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label class="form-label small" for="pApellido2">Segundo apellido</label>
+                        <input type="text" class="form-control" id="pApellido2" />
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label class="form-label small" for="pCedula">Cédula (9 dígitos)</label>
+                        <input type="text" class="form-control" id="pCedula" pattern="\d{9}" title="9 dígitos sin guiones" placeholder="123456789" />
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label class="form-label small" for="pTelefono">Teléfono</label>
+                        <input type="tel" class="form-control" id="pTelefono" pattern="[0-9+\-\s]{8,}" title="Mínimo 8 caracteres" placeholder="8888-8888" />
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label class="form-label small" for="pCorreo">Correo</label>
+                        <input type="email" class="form-control bg-light" id="pCorreo" disabled />
+                      </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-3">Guardar datos</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-lg-6">
+              <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                  <h2 class="h5 fw-bold mb-3">Direcciones guardadas</h2>
+                  <div id="listaDirecciones" class="mb-3"></div>
+
+                  <hr />
+                  <h3 class="h6 fw-bold mb-2">Agregar dirección</h3>
+                  <form id="formDireccion">
+                    <div class="row g-2">
+                      <div class="col-12 col-md-6">
+                        <select class="form-select form-select-sm" id="dTipo" aria-label="Tipo de dirección">
+                          <option value="casa">Casa</option>
+                          <option value="trabajo">Trabajo</option>
+                          <option value="otra">Otra</option>
+                        </select>
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <input type="text" class="form-control form-control-sm" id="dProvincia" placeholder="Provincia" required />
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <input type="text" class="form-control form-control-sm" id="dCanton" placeholder="Cantón" required />
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <input type="text" class="form-control form-control-sm" id="dDistrito" placeholder="Distrito" required />
+                      </div>
+                      <div class="col-12 col-md-4">
+                        <input type="text" class="form-control form-control-sm" id="dCodigoPostal" inputmode="numeric" placeholder="Código postal" />
+                      </div>
+                      <div class="col-12 col-md-8">
+                        <input type="text" class="form-control form-control-sm" id="dDireccionExacta" placeholder="Dirección exacta" required />
+                      </div>
+                    </div>
+                    <button type="submit" class="btn btn-outline-primary btn-sm mt-2">
+                      <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Agregar dirección
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="tabClave" role="tabpanel">
+          <div class="card border-0 shadow-sm" style="max-width: 500px">
+            <div class="card-body p-4">
+              <h2 class="h5 fw-bold mb-1">Cambiar contraseña</h2>
+              <p class="text-muted small mb-3">Usá una contraseña segura de al menos 6 caracteres.</p>
+              <form id="formContrasenna">
+                <div class="mb-3">
+                  <label class="form-label small" for="claveActual">Contraseña actual</label>
+                  <div class="input-group">
+                    <input type="password" class="form-control" id="claveActual" required />
+                    <button type="button" class="btn btn-outline-secondary" onclick="alternarVisibilidadPassword('claveActual', this)" aria-label="Mostrar"><i class="bi bi-eye"></i></button>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label small" for="claveNueva">Nueva contraseña</label>
+                  <div class="input-group">
+                    <input type="password" class="form-control" id="claveNueva" minlength="6" required />
+                    <button type="button" class="btn btn-outline-secondary" onclick="alternarVisibilidadPassword('claveNueva', this)" aria-label="Mostrar"><i class="bi bi-eye"></i></button>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label small" for="claveConfirmar">Confirmar nueva contraseña</label>
+                  <input type="password" class="form-control" id="claveConfirmar" minlength="6" required />
+                </div>
+                <button type="submit" class="btn btn-primary">Actualizar contraseña</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="modalDetalleMiPedido" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content border-0 shadow">
+            <div class="modal-header">
+              <h5 class="modal-title fw-bold" id="tituloMiPedido">Detalle del pedido</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" id="cuerpoMiPedido"></div>
+            <div class="modal-footer flex-wrap gap-2">
+              <button type="button" class="btn btn-outline-danger btn-sm me-auto d-none" id="btnCancelarEnModal">
+                Cancelar pedido
+              </button>
+              <button type="button" class="btn btn-outline-primary btn-sm" id="btnReordenarEnModal">
+                <i class="bi bi-arrow-repeat me-1"></i>Volver a comprar
+              </button>
+              <button type="button" class="btn btn-light border btn-sm" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer></footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/sesion.js"></script>
+    <script src="js/misc.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/menuTienda.js"></script>
+    <script src="js/perfil.js"></script>
+  </body>
+</html>

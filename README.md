@@ -40,20 +40,9 @@ PORT=5001
 MONGO_URI=mongodb://localhost:27017/nombrebd
 JWT_SECRET=cambia_esta_clave_por_una_larga_y_aleatoria
 JWT_EXPIRA=8h
-ADMIN_NOMBRE=Admin
-ADMIN_CORREO=admin@tienda.com
-ADMIN_CONTRASENNA=Admin123!
 ```
 
-4. Crear el usuario administrador inicial:
-
-```bash
-npm run seed:admin
-```
-
-Crea (o actualiza) un usuario con `rol: admin` usando `ADMIN_CORREO` y `ADMIN_CONTRASENNA`.
-
-5. Ejecutar el servidor:
+4. Ejecutar el servidor:
 
 ```bash
 npm start
@@ -73,7 +62,7 @@ La API usa **JWT**. Los endpoints de login y registro devuelven un `token` que d
 Authorization: Bearer <token>
 ```
 
-El token dura **8 horas**. El registro siempre crea usuarios con `rol: cliente`; los administradores se crean con `npm run seed:admin`.
+El token dura **8 horas**. El registro público siempre crea usuarios con `rol: cliente`.
 
 ### Endpoints de autenticación
 
@@ -162,8 +151,6 @@ Cuerpo para crear o actualizar:
 ```json
 {
   "nombre": "Tecnologia",
-  "descripcion": "Equipos y accesorios",
-  "icono": "laptop",
   "padre": null,
   "estado": true
 }
@@ -175,7 +162,7 @@ Las consultas son públicas; crear, editar, actualizar stock y eliminar requiere
 
 | Método | Ruta | Descripción | Cuerpo / parámetros |
 |---|---|---|---|
-| GET | `/productos` | Lista productos con filtros | `?q=`, `?categoria=`, `?precioMin=`, `?precioMax=`, `?viral=`, `?destacado=`, `?estado=`, `?stockBajo=true` |
+| GET | `/productos` | Lista productos con filtros | `?q=`, `?categoria=`, `?precioMin=`, `?precioMax=`, `?destacado=`, `?estado=`, `?stockBajo=true` |
 | GET | `/productos/:id` | Producto por ID | — |
 | POST | `/productos` | Crea un producto | Ver ejemplo |
 | PUT | `/productos/:id` | Actualiza un producto | Campos a modificar |
@@ -195,7 +182,6 @@ Cuerpo para crear o actualizar:
   "marca": "Sony",
   "sku": "AUD-SONY-100",
   "imagenes": ["https://cdn.example.com/productos/audifonos.jpg"],
-  "viral": true,
   "destacado": true,
   "estado": true
 }
@@ -327,10 +313,9 @@ Todas las respuestas de error tienen la forma:
 
 Archivo: `API/postman/ProyectoIntegrador1.postman_collection.json`
 
-1. Ejecutar `npm run seed:admin` (la colección usa el admin para las rutas protegidas).
-2. Abrir Postman → **Import** → seleccionar el archivo.
-3. Verificar la variable `baseUrl` (`http://localhost:5001`).
-4. Ejecutar con **Collection Runner** respetando el orden de las carpetas.
+1. Abrir Postman → **Import** → seleccionar el archivo.
+2. Verificar la variable `baseUrl` (`http://localhost:5001`).
+3. Ejecutar con **Collection Runner** respetando el orden de las carpetas.
 
 La carpeta **0. Auth** hace login del admin y registra un cliente, y guarda los tokens en las variables `adminToken` y `token`. El resto de las peticiones usan esos tokens automáticamente. Las variables de ids (`usuarioId`, `categoriaId`, `productoId`, `pedidoId`, etc.) también se capturan solas. La carpeta **8. Limpieza** elimina los registros creados.
 
@@ -354,36 +339,4 @@ Incluye casos de éxito y de error (400, 401, 404 y 409) para cada entidad.
 | `usuarios.html` | PI-1/PI-2 Admin Usuarios | Usuario |
 | `resennas.html` | PI-7 Admin Reseñas | Reseña |
 | `pagos.html` | PI-9/PI-12 Pagos | Pago |
-
-### Capturas
-
-#### Tienda
-
-![Tienda en escritorio](frontend/public/img/capturas/escritorio-tienda.jpg)
-
-![Tienda en móvil](frontend/public/img/capturas/movil-tienda.jpg)
-
-#### Carrito
-
-![Carrito en escritorio](frontend/public/img/capturas/escritorio-carrito.jpg)
-
-![Carrito en móvil](frontend/public/img/capturas/movil-carrito.jpg)
-
-#### Checkout
-
-![Checkout en escritorio](frontend/public/img/capturas/escritorio-checkout.jpg)
-
-![Checkout en móvil](frontend/public/img/capturas/movil-checkout.jpg)
-
-#### Panel admin — Productos
-
-![Productos en escritorio](frontend/public/img/capturas/escritorio-productos.jpg)
-
-![Productos en móvil](frontend/public/img/capturas/movil-productos.jpg)
-
-#### Login
-
-![Login en escritorio](frontend/public/img/capturas/escritorio-login.jpg)
-
-![Login en móvil](frontend/public/img/capturas/movil-login.jpg)
 

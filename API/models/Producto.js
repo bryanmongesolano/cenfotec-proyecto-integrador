@@ -44,10 +44,6 @@ const ProductoSchema = new mongoose.Schema({
         type: [String],
         default: []
     },
-    viral: {
-        type: Boolean,
-        default: false
-    },
     destacado: {
         type: Boolean,
         default: false

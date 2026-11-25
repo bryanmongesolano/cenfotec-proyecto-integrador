@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 
-// Copia de la dirección al momento de la compra: si el usuario cambia
-// su dirección después, el pedido histórico no se altera.
 const DireccionEnvioSchema = new mongoose.Schema({
     provincia: {
         type: String,
@@ -102,6 +100,11 @@ const PedidoSchema = new mongoose.Schema({
         type: Number,
         default: 0,
         min: 0
+    },
+    codigoCupon: {
+        type: String,
+        trim: true,
+        uppercase: true
     },
     total: {
         type: Number,

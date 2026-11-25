@@ -1,6 +1,7 @@
 const Carrito = require('../models/Carrito');
 const Producto = require('../models/Producto');
 const Usuario = require('../models/Usuario');
+const { responderError } = require('../utils/errores');
 
 async function obtenerOCrearCarrito(usuarioId) {
     const usuario = await Usuario.findById(usuarioId);
@@ -28,10 +29,23 @@ const listar = async (req, res) => {
 
         await carrito.populate('items.producto', 'nombre precio stock imagenes estado');
 
+        let cambioPrecio = false;
+        for (const item of carrito.items) {
+            if (item.producto && typeof item.producto.precio === 'number' && item.precioUnitario !== item.producto.precio) {
+                item.precioUnitario = item.producto.precio;
+                cambioPrecio = true;
+            }
+        }
+
+        if (cambioPrecio) {
+            carrito.recalcularTotal();
+            await carrito.save();
+            await carrito.populate('items.producto', 'nombre precio stock imagenes estado');
+        }
+
         res.json(carrito);
     } catch (error) {
-        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
-        res.status(codigo).json({ message: error.message });
+        responderError(res, error);
     }
 };
 
@@ -52,7 +66,7 @@ const agregarItem = async (req, res) => {
         const producto = await Producto.findById(productoId);
 
         if (!producto) {
-            return res.status(404).json({ message: "Producto no encontrado" + productoId });
+            return res.status(404).json({ message: "Producto no encontrado: " + productoId });
         }
 
         if (!producto.estado) {
@@ -98,8 +112,7 @@ const agregarItem = async (req, res) => {
             datos: carritoGuardado
         })
     } catch (error) {
-        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
-        res.status(codigo).json({ message: error.message });
+        responderError(res, error);
     }
 };
 
@@ -151,8 +164,7 @@ const actualizarItem = async (req, res) => {
             datos: carritoGuardado
         });
     } catch (error) {
-        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
-        res.status(codigo).json({ message: error.message });
+        responderError(res, error);
     }
 };
 
@@ -182,8 +194,7 @@ const quitarItem = async (req, res) => {
             datos: carritoGuardado
         });
     } catch (error) {
-        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
-        res.status(codigo).json({ message: error.message });
+        responderError(res, error);
     }
 };
 
@@ -205,8 +216,7 @@ const vaciar = async (req, res) => {
             datos: req.params.usuarioId
         });
     } catch (error) {
-        const codigo = error.code === 11000 ? 409 : (error.name === 'ValidationError' || error.name === 'CastError') ? 400 : 500;
-        res.status(codigo).json({ message: error.message });
+        responderError(res, error);
     }
 };
 

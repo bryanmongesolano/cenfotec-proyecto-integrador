@@ -6,14 +6,6 @@ const CategoriaSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    descripcion: {
-        type: String,
-        trim: true
-    },
-    icono: {
-        type: String,
-        trim: true
-    },
     padre: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Categoria',

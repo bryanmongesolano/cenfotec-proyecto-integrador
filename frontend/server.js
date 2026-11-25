@@ -7,6 +7,10 @@ const app = express();
 const PORT = 5002;
 
 
+app.get('/', (req, res) => {
+    res.redirect('/tienda.html');
+});
+
 app.use(express.static(
     path.join(__dirname, "public")
 ));

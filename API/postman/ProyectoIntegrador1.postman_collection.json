@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Proyecto Integrador 1 - API E-commerce",
-    "description": "Coleccion de pruebas de la API REST con autenticacion JWT. Antes de ejecutar: npm run seed:admin. Luego ejecutar con el Collection Runner en el orden de las carpetas. La carpeta 0. Auth obtiene adminToken y token; el resto los usa automaticamente.",
+    "description": "Coleccion de pruebas de la API REST con autenticacion JWT. Ejecutar con el Collection Runner en el orden de las carpetas. La carpeta 0. Auth obtiene adminToken y token; el resto los usa automaticamente.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -700,7 +700,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Tecnologia\",\n  \"descripcion\": \"Equipos y accesorios\",\n  \"estado\": true,\n  \"icono\": \"laptop\"\n}",
+              "raw": "{\n  \"nombre\": \"Tecnologia\",\n  \"estado\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -743,7 +743,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Audio\",\n  \"descripcion\": \"Audifonos y parlantes\",\n  \"padre\": \"{{categoriaId}}\",\n  \"icono\": \"headphones\"\n}",
+              "raw": "{\n  \"nombre\": \"Audio\",\n  \"padre\": \"{{categoriaId}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1028,32 +1028,6 @@
           }
         },
         {
-          "name": "Filtrar virales",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"HTTP 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{baseUrl}}/productos?viral=true"
-          }
-        },
-        {
           "name": "Filtrar destacados",
           "event": [
             {
@@ -1138,7 +1112,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Audífonos Bluetooth\",\n  \"descripcion\": \"Inalámbricos con cancelación de ruido\",\n  \"precio\": 45900,\n  \"stock\": 12,\n  \"stockMinimo\": 3,\n  \"categoria\": \"{{categoriaId}}\",\n  \"marca\": \"Sony\",\n  \"sku\": \"AUD-SONY-100\",\n  \"imagenes\": [\n    \"https://cdn.example.com/productos/audifonos-1.jpg\"\n  ],\n  \"viral\": true,\n  \"destacado\": true,\n  \"estado\": true\n}",
+              "raw": "{\n  \"nombre\": \"Audífonos Bluetooth\",\n  \"descripcion\": \"Inalámbricos con cancelación de ruido\",\n  \"precio\": 45900,\n  \"stock\": 12,\n  \"stockMinimo\": 3,\n  \"categoria\": \"{{categoriaId}}\",\n  \"marca\": \"Sony\",\n  \"sku\": \"AUD-SONY-100\",\n  \"imagenes\": [\n    \"https://cdn.example.com/productos/audifonos-1.jpg\"\n  ],\n  \"destacado\": true,\n  \"estado\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"

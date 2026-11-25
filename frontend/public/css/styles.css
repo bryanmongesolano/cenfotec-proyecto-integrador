@@ -1,79 +1,67 @@
-:root {
-    --brand: #1f3a5f;
-    --brand-dark: #16293f;
-    --accent: #0d6efd;
-    --bg: #f5f6f8;
-}
-
-body {
-    background-color: var(--bg);
-    color: #212529;
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-}
-
 main {
-    min-height: calc(100vh - 150px);
+    min-height: calc(100vh - 180px);
 }
 
-.navbar-tienda {
-    background-color: var(--brand);
+.admin-sidebar-lg {
+    width: 260px;
 }
 
-.navbar-admin {
-    background-color: var(--brand-dark);
+.hero-product-box {
+    height: 270px;
 }
 
-.page-title {
-    font-weight: 600;
+.hero-product-img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
 }
 
-.card {
-    border: 0;
-    transition: box-shadow .2s ease, transform .2s ease;
+.product-card {
+    transition: transform .2s ease, box-shadow .2s ease;
 }
 
-.card:hover {
-    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .08);
+.product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 .75rem 1.5rem rgba(0, 0, 0, .1) !important;
 }
 
-.store-hero {
-    background: linear-gradient(135deg, var(--brand), var(--brand-dark));
-    color: #fff;
+.product-card img.card-img-top {
+    height: 205px;
+    object-fit: contain;
+    background-color: #fff;
+    padding: 0.75rem;
 }
 
-.product-card img {
-    height: 180px;
-    object-fit: cover;
-    background-color: #e9ecef;
+.detail-carousel-img {
+    height: 410px;
+    object-fit: contain;
+    background-color: #fff;
+    padding: 1rem;
 }
 
-.detail-img {
-    width: 100%;
-    max-height: 420px;
-    object-fit: cover;
-    border-radius: .5rem;
-    background-color: #e9ecef;
+.detail-thumb {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    background-color: #fff;
+    padding: 4px;
+    cursor: pointer;
 }
 
 .thumb {
-    width: 42px;
-    height: 42px;
-    object-fit: cover;
-    border-radius: 6px;
-    background-color: #e9ecef;
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+    background-color: #fff;
+    padding: 4px;
 }
 
-.btn {
-    transition: transform .15s ease, box-shadow .15s ease;
-}
-
-.btn:hover {
-    transform: translateY(-1px);
-}
-
-.table td,
-.table th {
-    vertical-align: middle;
+.preview-img-box {
+    width: 84px;
+    height: 84px;
+    object-fit: contain;
+    background-color: #fff;
+    padding: 4px;
 }
 
 .stars {
@@ -81,11 +69,20 @@ main {
     letter-spacing: 1px;
 }
 
-.login-card {
-    max-width: 420px;
-    margin: 8vh auto;
+#mensajeSpinner {
+    position: fixed;
+    top: 72px;
+    right: 16px;
+    z-index: 1080;
+    pointer-events: none;
 }
 
-footer {
-    font-size: .875rem;
+@media (max-width: 767.98px) {
+    .hero-product-box {
+        height: 200px;
+    }
+
+    .detail-carousel-img {
+        height: 270px;
+    }
 }

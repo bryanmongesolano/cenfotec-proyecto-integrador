@@ -26,6 +26,7 @@ app.use('/carrito', require('./routes/CarritoRoutes'));
 app.use('/pedidos', require('./routes/PedidoRoutes'));
 app.use('/resennas', require('./routes/ResennaRoutes'));
 app.use('/pagos', require('./routes/PagoRoutes'));
+app.use('/cupones', require('./routes/CuponRoutes'));
 
 
 
